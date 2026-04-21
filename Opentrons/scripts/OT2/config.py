@@ -10,10 +10,12 @@ LYSIS_VOL  = float(os.environ.get('LYSIS_VOL',  '1800'))  # lysis buffer per col
 ETOH_VOL   = float(os.environ.get('ETOH_VOL',   '3000'))  # EtOH per column (step 3)
 START_COL  = int(os.environ.get('START_COL',  '0'))        # 0-indexed; batch 1=0, batch 2=6
 STOP_COL   = int(os.environ.get('STOP_COL',   '6'))        # exclusive; 6 for 48 samples, 12 for 96
+N_SAMPLES  = int(os.environ.get('N_SAMPLES',  '48'))       # total wells to process; 2 for quick test
 FILTER_COL_START = int(os.environ.get('FILTER_COL_START', '0'))  # 0-indexed column; batch 1=0, batch 2=6
 
 # ── Standard Opentrons labware ─────────────────────────────────────────────
 TIPS_200      = 'opentrons_96_filtertiprack_200ul'
+TIPS_300      = 'opentrons_96_tiprack_300ul'
 TIPS_1000     = 'opentrons_96_filtertiprack_1000ul'
 RESERVOIR_1   = 'nest_1_reservoir_195ml'    # 195 mL single trough
 RESERVOIR_12  = 'nest_12_reservoir_15ml'    # 12 separate 22 mL troughs

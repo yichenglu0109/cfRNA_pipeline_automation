@@ -18,15 +18,31 @@ Right : p1000_single_gen2
 """
 
 import sys, os
-sys.path.append('/data/user_storage/cfRNA')
-from config import *
+try:
+    sys.path.insert(0, '/data/user_storage/cfRNA')
+    from config import *
+except ImportError:
+    LYSIS_VOL=float(os.environ.get('LYSIS_VOL','1800'))
+    ETOH_VOL=float(os.environ.get('ETOH_VOL','3000'))
+    START_COL=int(os.environ.get('START_COL','0'))
+    STOP_COL=int(os.environ.get('STOP_COL','6'))
+    FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
+    TIPS_200='opentrons_96_filtertiprack_200ul'
+    TIPS_1000='opentrons_96_filtertiprack_1000ul'
+    RESERVOIR_1='nest_1_reservoir_195ml'
+    RESERVOIR_12='nest_12_reservoir_15ml'
+    WELLPLATE_2ML='nest_96_wellplate_2ml_deep'
+    PCR_PLATE='nest_96_wellplate_100ul_pcr_full_skirt'
+    PLATE_48='nest_96_wellplate_2ml_deep'       # simulation substitute
+    NORGEN_FILTER='nest_96_wellplate_2ml_deep'  # simulation substitute
+    ZYMO_FILTER='nest_96_wellplate_2ml_deep'    # simulation substitute
 
 from opentrons import protocol_api
 
 metadata = {
     'protocolName': 'cfRNA Step 4 – Transfer to Norgen Filter Plate',
     'author': 'Adapted from Moufarrej & Quake (2023) Nature Protocols',
-    'apiLevel': API_LEVEL,
+    'apiLevel': '2.13',
 }
 
 
