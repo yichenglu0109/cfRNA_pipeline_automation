@@ -27,7 +27,9 @@ except ImportError:
     START_COL=int(os.environ.get('START_COL','0'))
     STOP_COL=int(os.environ.get('STOP_COL','6'))
     FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
-    N_SAMPLES=int(os.environ.get('N_SAMPLES','48'))
+    N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
+    TIP_START=int(os.environ.get('TIP_START','0'))    # 0=A1, 1=B1, ..., 8=A2
+    WELL_START=int(os.environ.get('WELL_START','0'))  # 0=A1, 1=B1, ..., 9=A2
     TIPS_200='opentrons_96_filtertiprack_200ul'
     TIPS_300='opentrons_96_tiprack_300ul'
     TIPS_1000='opentrons_96_filtertiprack_1000ul'
@@ -35,15 +37,20 @@ except ImportError:
     RESERVOIR_12='nest_12_reservoir_15ml'
     WELLPLATE_2ML='nest_96_wellplate_2ml_deep'
     PCR_PLATE='nest_96_wellplate_100ul_pcr_full_skirt'
-    PLATE_48='nest_96_wellplate_2ml_deep'       # simulation substitute
-    NORGEN_FILTER='nest_96_wellplate_2ml_deep'  # simulation substitute
-    ZYMO_FILTER='nest_96_wellplate_2ml_deep'    # simulation substitute
+    PLATE_48='custom_48_wellplate_7000ul'       # simulation substitute
+    NORGEN_FILTER='custom_norgen_96filterplate'  # simulation substitute
+    ZYMO_FILTER='custom_zymo_96filterplate'    # simulation substitute
+
+# Pilot defaults; environment variables can still override these per run.
+N_SAMPLES=int(os.environ.get('N_SAMPLES','16'))
+TIP_START=int(os.environ.get('TIP_START','9'))    # 0=A1, 1=B1, ..., 8=A2
+WELL_START=int(os.environ.get('WELL_START','0'))  # 0=A1, 1=B1, ..., 8=A2
 
 from opentrons import protocol_api
 
 metadata = {
     'protocolName': 'cfRNA Step 1 – Slurry + Lysis Buffer',
-    'author': 'Adapted from Moufarrej & Quake (2023) Nature Protocols',
+    'author': 'Peter Lu, adapted from Moufarrej & Quake (2023) Nature Protocols',
     'apiLevel': '2.13',
 }
 
@@ -59,13 +66,14 @@ def run(protocol: protocol_api.ProtocolContext):
 
     # ── Pipettes ──────────────────────────────────────────────────────────
     p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips_300])
+    p300.starting_tip = tips_300.wells()[TIP_START]
 
     slurry_src  = slurry_res.wells()[0]   # single-well reservoir
     lysis_src   = lysis_res.wells()[0]
-    target_wells = plate_A.wells()[:N_SAMPLES]   # e.g. first 2 wells for testing
+    target_wells = plate_A.wells()[WELL_START:WELL_START + N_SAMPLES]
 
     # ════════════════════════════════════════════════════════════════════
-    # STEP A – Slurry (190 µL per well, slow aspirate; 1 tip reused)
+    # STEP A – Slurry (200 µL per well, slow aspirate; 1 tip reused)
     # ════════════════════════════════════════════════════════════════════
     protocol.pause(
         "STEP 1A  ▶  Place 48-well plate at SLOT 5. "
@@ -76,10 +84,10 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.pick_up_tip()
     for well in target_wells:
         p300.mix(1, 100, slurry_src.bottom(2))
-        p300.aspirate(190, slurry_src.bottom(2), rate=0.1)
+        p300.aspirate(200, slurry_src.bottom(2), rate=0.2)
         protocol.delay(seconds=1.5)
         p300.air_gap(10)
-        p300.dispense(200, well.top(-30))
+        p300.dispense(210, well.top(-30))
         p300.blow_out(well.top(-30))
     p300.drop_tip()
 
@@ -96,12 +104,13 @@ def run(protocol: protocol_api.ProtocolContext):
     iters    = math.ceil(LYSIS_VOL / 250)        # 1800 → 8
     per_disp = round(LYSIS_VOL / iters, 1)       # 225.0 µL
 
-    target_wells_B = plate_B.wells()[:N_SAMPLES]
+    target_wells_B = plate_B.wells()[WELL_START:WELL_START + N_SAMPLES]
     p300.pick_up_tip()
     for well in target_wells_B:
         for _ in range(iters):
             p300.aspirate(per_disp, lysis_src.bottom(2))
             p300.dispense(per_disp, well.top(-20))
+            p300.blow_out(well.top(-20))
     p300.drop_tip()
 
     protocol.comment(

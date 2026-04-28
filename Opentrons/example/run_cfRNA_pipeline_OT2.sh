@@ -95,12 +95,16 @@ FILTER_COL_BATCH1=0
 
 echo "[Step 4] Transfer to Norgen filter plate (col offset ${FILTER_COL_BATCH1})" | tee -a "$LOG_FILE"
 run_on_robot 4_transfer_to_filter.py \
-    "FILTER_COL_START=${FILTER_COL_BATCH1} START_COL=0 STOP_COL=6"
+    "N_SAMPLES=48 WELL_START=0 FILTER_COL_START=${FILTER_COL_BATCH1} TIP_START=0"
 
-# Step 5 – wash + elute
-echo "[Step 5] Norgen wash + elute (batch 1)" | tee -a "$LOG_FILE"
-run_on_robot 5_norgen_wash_elute.py \
-    "START_COL=0 STOP_COL=6"
+# Step 5 – wash on kit collection plate, then elute into 2 mL deep-well plate
+echo "[Step 5] Norgen wash on kit collection plate (batch 1)" | tee -a "$LOG_FILE"
+run_on_robot 5_norgen_wash.py \
+    "N_SAMPLES=48 FILTER_COL_START=${FILTER_COL_BATCH1} TIP_START=0"
+
+echo "[Step 5b] Norgen elution into 2 mL deep-well plate (batch 1)" | tee -a "$LOG_FILE"
+run_on_robot 5b_norgen_elute.py \
+    "N_SAMPLES=48 FILTER_COL_START=${FILTER_COL_BATCH1} TIP_START=3"
 
 # Batch 1 done – refrigerate eluate, decide whether to do Zymo now
 echo "" | tee -a "$LOG_FILE"
@@ -128,11 +132,15 @@ run_on_robot 3_etoh_centrifuge.py \
 
 echo "[Step 4] Transfer to Norgen filter plate (batch 2, col offset 6)" | tee -a "$LOG_FILE"
 run_on_robot 4_transfer_to_filter.py \
-    "FILTER_COL_START=6 START_COL=0 STOP_COL=6"
+    "N_SAMPLES=48 WELL_START=0 FILTER_COL_START=6 TIP_START=0"
 
-echo "[Step 5] Norgen wash + elute (batch 2, cols 7–12)" | tee -a "$LOG_FILE"
-run_on_robot 5_norgen_wash_elute.py \
-    "START_COL=6 STOP_COL=12"
+echo "[Step 5] Norgen wash on kit collection plate (batch 2, cols 7–12)" | tee -a "$LOG_FILE"
+run_on_robot 5_norgen_wash.py \
+    "N_SAMPLES=48 FILTER_COL_START=6 TIP_START=0"
+
+echo "[Step 5b] Norgen elution into 2 mL deep-well plate (batch 2, cols 7–12)" | tee -a "$LOG_FILE"
+run_on_robot 5b_norgen_elute.py \
+    "N_SAMPLES=48 FILTER_COL_START=6 TIP_START=3"
 
 # =============================================================================
 # ── DNase digestion (manual) ─────────────────────────────────────────────

@@ -27,7 +27,8 @@ PCR_PLATE     = 'nest_96_wellplate_100ul_pcr_full_skirt'
 PLATE_48      = 'custom_48_wellplate_7000ul'     # Thomas Scientific 1149Q15
                                                   # 8 rows (A-H) × 6 cols, 9mm col spacing,
                                                   # 18mm row spacing, 7 mL/well, depth 65 mm
-NORGEN_FILTER = 'custom_norgen_96filterplate'     # Norgen filter plate (from kit 29500)
+NORGEN_FILTER = 'custom_norgen_96filterplate'     # Norgen filter plate on kit collection plate
+NORGEN_FILTER_ON_2ML = 'custom_norgen_96filterplate_on_2ml_deep'
 ZYMO_FILTER   = 'custom_zymo_96filterplate'       # Zymo filter plate (from kit R1080)
 
 API_LEVEL = '2.13'
