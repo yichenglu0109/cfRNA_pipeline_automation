@@ -19,7 +19,7 @@ TIPS_300      = 'opentrons_96_tiprack_300ul'
 TIPS_1000     = 'opentrons_96_filtertiprack_1000ul'
 RESERVOIR_1   = 'nest_1_reservoir_195ml'    # 195 mL single trough
 RESERVOIR_12  = 'nest_12_reservoir_15ml'    # 12 separate 22 mL troughs
-WELLPLATE_2ML = 'nest_96_wellplate_2ml_deep'
+WELLPLATE_2ML = 'thermoscientificnunc_96_wellplate_2000ul'
 PCR_PLATE     = 'nest_96_wellplate_100ul_pcr_full_skirt'
 
 # ── Custom labware (JSON must be installed at /data/labware/ on robot) ─────

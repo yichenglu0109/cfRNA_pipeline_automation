@@ -45,7 +45,7 @@ except ImportError:
 # Pilot defaults; environment variables can still override these per run.
 N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
 FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
-TIP_START=int(os.environ.get('TIP_START','3'))   # after Step 5 wash uses A1-C1
+TIP_START=int(os.environ.get('TIP_START','33'))   # after Step 5 wash uses A1-C1
 WELL_START=int(os.environ.get('WELL_START','0'))  # unused by this column-wise script
 
 from opentrons import protocol_api

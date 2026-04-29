@@ -5,8 +5,8 @@ Tips  : p20 × 1 tip
 
 Deck layout
 -----------
-Slot 2 : nest_96_wellplate_2ml_deep   – elution plate from Step 5
-Slot 4 : nest_12_reservoir_15ml       – DNase master mix in well A1
+Slot 2 : thermoscientificnunc_96_wellplate_2000ul – elution plate from Step 5
+Slot 4 : nest_1_reservoir_195ml       – DNase master mix
                                          (11 µL 10× buffer + 2 µL DNase per well; 10% excess)
 Slot 6 : opentrons_96_tiprack_20ul
 
@@ -33,7 +33,7 @@ except ImportError:
     TIPS_1000='opentrons_96_filtertiprack_1000ul'
     RESERVOIR_1='nest_1_reservoir_195ml'
     RESERVOIR_12='nest_12_reservoir_15ml'
-    WELLPLATE_2ML='nest_96_wellplate_2ml_deep'
+    WELLPLATE_2ML='thermoscientificnunc_96_wellplate_2000ul'
     PCR_PLATE='nest_96_wellplate_100ul_pcr_full_skirt'
     PLATE_48='custom_48_wellplate_7000ul'
     NORGEN_FILTER='custom_norgen_96filterplate'
@@ -42,7 +42,7 @@ except ImportError:
 # Pilot defaults; environment variables can still override these per run.
 N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
 FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
-TIP_START=int(os.environ.get('TIP_START','0'))    # fresh p20 rack in slot 6
+TIP_START=int(os.environ.get('TIP_START','1'))    # fresh p20 rack in slot 6
 WELL_START=int(os.environ.get('WELL_START','0'))  # unused by this column-wise script
 
 from opentrons import protocol_api
@@ -67,7 +67,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # ── Labware ───────────────────────────────────────────────────────────
     tips_20       = protocol.load_labware('opentrons_96_tiprack_20ul', 6)
     elution_plate = protocol.load_labware(WELLPLATE_2ML, 2)
-    dnase_res     = protocol.load_labware(RESERVOIR_12,  4)
+    dnase_res     = protocol.load_labware(RESERVOIR_1,   4)
 
     # ── Pipettes ──────────────────────────────────────────────────────────
     p20 = protocol.load_instrument('p20_single_gen2', 'right', tip_racks=[tips_20])
@@ -80,14 +80,15 @@ def run(protocol: protocol_api.ProtocolContext):
         f"STEP 5c  ▶  Place the 2 mL deep-well elution plate (from Step 5b) at SLOT 2. "
         f"Prepare DNase master mix: 11 µL 10× DNase buffer + 2 µL DNase per well "
         f"({master_mix_ul} µL total for {n_wells} wells, 10% excess). "
-        f"Add master mix to position 1 of reservoir at SLOT 4. Resume."
+        f"Add master mix to the single-channel reservoir at SLOT 4. Resume."
     )
 
     p20.pick_up_tip()
     for col in target_cols:
         for well in col:
-            p20.aspirate(DNASE_VOL, dnase_src.bottom(2))
+            p20.aspirate(DNASE_VOL, dnase_src.bottom(1))
             p20.dispense(DNASE_VOL, well.bottom(5))
+            p20.blow_out(well.top(-5))
     p20.drop_tip()
 
     protocol.comment(

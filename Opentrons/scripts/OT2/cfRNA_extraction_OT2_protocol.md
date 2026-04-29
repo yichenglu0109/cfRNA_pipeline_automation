@@ -94,13 +94,12 @@ Custom labware must be installed on the OT-2:
 
 - `custom_48_wellplate_7000ul`
 - `custom_norgen_96filterplate`
-- `custom_zymo_96filterplate`
+- `custom_zymo_96filterplate` with the current 60 mm stack height definition
 
 Standard labware used by scripts:
 
 - `nest_1_reservoir_195ml`
-- `nest_12_reservoir_15ml`
-- `nest_96_wellplate_2ml_deep`
+- `thermoscientificnunc_96_wellplate_2000ul`
 - `opentrons_96_tiprack_300ul`
 - `opentrons_96_tiprack_20ul`, only for p20 scripts
 
@@ -111,20 +110,20 @@ volume. The current scripts use the following defaults:
 
 | Reagent | Current amount used in script |
 |---|---|
-| Slurry | 200 uL/well |
-| Lysis buffer | 1800 uL/well |
-| EtOH for extraction | 3000 uL/well |
-| Re-lysis buffer | 300 uL/well |
-| EtOH wash after re-lysis | 300 uL/well |
-| Norgen wash buffer | 400 uL/well/wash, 3 washes |
-| Norgen elution buffer | 100 uL/well in current script |
-| DNase master mix | 13 uL/well |
-| Zymo binding buffer | 226 uL/well |
-| Zymo EtOH | 339 uL/well |
-| RNA prep buffer | 400 uL/well |
-| Zymo wash 1 | 700 uL/well |
-| Zymo wash 2 | 400 uL/well |
-| Final nuclease-free water | 12.5 uL/well |
+| Slurry | **200 uL/well** |
+| Lysis buffer | **1800 uL/well** |
+| EtOH for extraction | **3000 uL/well** |
+| Re-lysis buffer | **300 uL/well** |
+| EtOH wash after re-lysis | **300 uL/well** |
+| Norgen wash buffer | **400 uL/well/wash, 3 washes** |
+| Norgen elution buffer | **100 uL/well** in current script |
+| DNase master mix | **13 uL/well** |
+| Zymo binding buffer | **226 uL/well** |
+| Zymo EtOH | **339 uL/well** |
+| RNA prep buffer | **400 uL/well** |
+| Zymo wash 1 | **700 uL/well** |
+| Zymo wash 2 | **400 uL/well** |
+| Final nuclease-free water | **12.5 uL/well** |
 
 **Critical step:** pre-warmed slurry and lysis buffer can crystallize or clog tips
 if cooled. Work promptly after vortexing and loading these reagents.
@@ -147,10 +146,10 @@ Validate these low/sensitive positions before production:
 
 | Step | Operation | Position |
 |---|---|---|
-| Step 1 | slurry aspiration | reservoir `bottom(2)` |
-| Step 3 | decant | 48-well staged heights down to `bottom(3)` |
-| Step 4 | sample transfer | 48-well `bottom(1.7)` |
-| Step 6 | Zymo transfer source | NEST 2 mL plate `bottom(0)` |
+| Step 1 | slurry aspiration | reservoir **`bottom(2)`** |
+| Step 3 | decant | 48-well staged heights down to **`bottom(3)`** |
+| Step 4 | sample transfer | 48-well **`bottom(1.7)`** |
+| Step 6 | Zymo transfer source | Thermo Scientific Nunc 2 mL plate **`bottom(0)`** |
 
 ## Procedure
 
@@ -182,13 +181,13 @@ Current deck layout:
 
 1. Place the 48-well plate at slot 5.
 2. Vortex preheated slurry thoroughly.
-3. Add about 10.5 mL slurry to the reservoir at slot 4.
+3. Add about **10.5 mL slurry** to the reservoir at slot 4.
 4. Start or resume `1_add_slurry_lysis.py`.
-5. The robot adds 200 uL slurry to each target well. The current script aspirates slurry from `bottom(2)` at slow rate and dispenses near the top of each 48-well.
+5. The robot adds **200 uL slurry** to each target well. The current script aspirates slurry from **`bottom(2)`** at slow rate and dispenses near the top of each 48-well.
 6. When prompted, move the 48-well plate to slot 2.
-7. Add about 40 mL preheated lysis buffer plus 1.2% B-ME to the slot 1 reservoir. Refill in about 40 mL batches if needed.
+7. Add about **40 mL preheated lysis buffer plus 1.2% B-ME** to the slot 1 reservoir. Refill in about **40 mL** batches if needed.
 8. Resume the robot.
-9. The robot adds 1800 uL lysis buffer per well, split into serial p300 dispenses.
+9. The robot adds **1800 uL lysis buffer per well**, split into serial p300 dispenses.
 
 **Pause point:** after lysis buffer addition, proceed manually to sample addition.
 
@@ -199,9 +198,9 @@ No OT-2 script.
 **Timing:** 15-25 min.
 
 10. Add samples manually to the lysis/slurry plate.
-11. Mix each column at least 5 times with a P1000 multichannel.
+11. Mix each column **at least 5 times** with a P1000 multichannel.
 12. Seal the plate.
-13. Incubate at 60 C for 10 min.
+13. Incubate at **60 C for 10 min**.
 14. Return the plate to the robot area for Step 3.
 
 **Critical step:** keep the plate sealed except during active pipetting. Move
@@ -228,37 +227,37 @@ Current deck layout:
 | 9 | `opentrons_96_tiprack_300ul` | p300 tips |
 
 15. Place the sealed 48-well sample plate at slot 2.
-16. Add about 150 mL 200-proof EtOH to the slot 1 reservoir.
+16. Add about **150 mL 200-proof EtOH** to the slot 1 reservoir.
 17. Load p300 tip racks at slots 8 and 9.
 18. Remove the plate seal.
 19. Resume the robot.
-20. The current script adds 3000 uL EtOH per well with p300, split into 12 transfers of 250 uL.
-21. When prompted, seal the plate and vortex at least 30 s to mix EtOH with sample. Briefly spin or tap down if liquid remains on the seal or well walls.
+20. The current script adds **3000 uL EtOH per well** with p300, split into **12 transfers of 250 uL**.
+21. When prompted, **seal the plate and vortex at least 30 s** to mix EtOH with sample. Briefly spin or tap down if liquid remains on the seal or well walls.
 
 **Optimization note:** with `p1000_single_gen2`, the 3000 uL EtOH addition should
 be refactored to about 3-4 transfers per well. This is one of the largest speed
 gains available.
 
-22. Centrifuge 30 sec at 1,000g at room temperature to pellet slurry.
+22. Centrifuge **30 sec at 1,000g** at room temperature to pellet slurry.
 23. Return the plate to slot 2 unsealed.
 24. Place an open liquid-waste container at slot 5.
 25. Resume the robot.
-26. The robot decants supernatant from each target well using staged heights: 37, 34, 30, 26, 22, 18, 14, 10, 8, 6, 4 and 3 mm above bottom. Each height is used for two 250 uL aspirations at rate 0.5.
+26. The robot decants supernatant from each target well using staged heights: **37, 34, 30, 26, 22, 18, 14, 10, 8, 6, 4 and 3 mm above bottom**. Each height is used for **two 250 uL aspirations at rate 0.5**.
 
 **Critical step:** decant is pellet-sensitive. If using a modified p1000 or
 multi-channel decant, validate with mock slurry first. Do not optimize this step
 purely for speed.
 
 27. Remove the liquid-waste container from slot 5.
-28. Add 20 mL preheated lysis buffer to the slot 3 reservoir.
-29. Resume the robot. The robot adds 300 uL re-lysis buffer per well.
-30. Seal the plate and vortex at least 30 s.
-31. Incubate at 60 C for 10 min.
-32. If this is the first 48-sample batch, keep the incubator at 60 C. If this is the second 48-sample batch, set the incubator to 37 C for DNase.
-33. Empty the slot 3 reservoir and add 20 mL 200-proof EtOH.
+28. Add **20 mL preheated lysis buffer** to the slot 3 reservoir.
+29. Resume the robot. The robot adds **300 uL re-lysis buffer per well**.
+30. **Seal the plate and vortex at least 30 s**.
+31. Incubate at **60 C for 10 min**.
+32. If this is the first 48-sample batch, keep the incubator at **60 C**. If this is the second 48-sample batch, set the incubator to **37 C** for DNase.
+33. Empty the slot 3 reservoir and add **20 mL 200-proof EtOH**.
 34. Remove the seal from the plate and return it to slot 2.
-35. Resume the robot. The robot adds 300 uL EtOH wash per well.
-36. Seal the plate and vortex 1 min.
+35. Resume the robot. The robot adds **300 uL EtOH wash per well**.
+36. **Seal the plate and vortex 1 min**.
 
 **Pause point:** proceed immediately to Norgen transfer, or keep the plate sealed
 briefly while preparing Step 4.
@@ -283,12 +282,12 @@ Current deck layout:
 38. Place the Norgen filter plate on its collection plate at slot 5. Confirm A1 is top-left in the expected orientation.
 39. Set `FILTER_COL_START=0` for batch 1 or `FILTER_COL_START=6` for batch 2.
 40. Start or resume `4_transfer_to_filter.py`.
-41. At each source-column prompt, vortex the 48-well plate briefly, focusing on the active column.
-42. Remove the seal only from the active source column.
+41. At each source-column prompt, **vortex the 48-well plate briefly**, focusing on the active column.
+42. **Remove the seal only from the active source column**.
 43. Resume the robot.
-44. For each well, the current script mixes 2 x 250 uL at `bottom(2)`, then transfers 3 x 200 uL from source `bottom(1.7)` into Norgen filter `bottom(35)` with a 10 uL air gap.
+44. For each well, the current script mixes **3 x 250 uL at `bottom(2)`**, then transfers **3 x 230 uL = 690 uL** from source **`bottom(1.7)`** into Norgen filter **`top(-5)`** with a **10 uL air gap** each time.
 45. Repeat the prompt/resume process until all target wells are transferred.
-46. Centrifuge the Norgen filter plate with collection plate underneath for 2 min at maximum speed or 2,000 RPM at room temperature.
+46. Centrifuge the Norgen filter plate with collection plate underneath for **2 min at maximum speed or 2,000 RPM** at room temperature.
 
 **Critical step:** the Norgen filter plate must sit squarely on its collection
 plate. Verify orientation before centrifugation and before returning to the
@@ -310,13 +309,13 @@ Current deck layout:
 | 9 | `opentrons_96_tiprack_300ul` | p300 tips |
 
 47. Place the centrifuged Norgen filter plate on its collection plate at slot 2.
-48. Add 24 mL Norgen wash buffer to the slot 1 reservoir.
-49. Resume Wash 1. The robot adds 400 uL wash buffer per well.
-50. Centrifuge 2 min at maximum speed or 2,000 RPM at room temperature.
+48. Add **24 mL Norgen wash buffer** to the slot 1 reservoir.
+49. Resume Wash 1. The robot adds **400 uL wash buffer per well**.
+50. Centrifuge **2 min at maximum speed or 2,000 RPM** at room temperature.
 51. Discard flow-through.
 52. Repeat Steps 48-52 for Wash 2.
 53. Repeat the wash addition once more for Wash 3.
-54. After Wash 3, centrifuge 5 min at 2,000 RPM at room temperature for dry spin.
+54. After Wash 3, centrifuge **5 min at 2,000 RPM** at room temperature for dry spin.
 55. Discard flow-through.
 56. Discard flow-through.
 
@@ -332,12 +331,12 @@ Current deck layout:
 | 4 | `nest_1_reservoir_195ml` | Norgen elution buffer |
 | 9 | `opentrons_96_tiprack_300ul` | p300 tips |
 
-57. Replace the kit collection plate with a clean NEST 96-well 2 mL deep-well elution plate. Align A1 over A1.
-58. Add 10 mL elution buffer to the single-channel reservoir at slot 4.
+57. **Replace the kit collection plate with a clean NEST 96-well 2 mL deep-well elution plate. Align A1 over A1.**
+58. Add **10 mL elution buffer** to the single-channel reservoir at slot 4.
 59. Place filter plus 2 mL deep-well elution plate at slot 2.
-60. Resume `5b_norgen_elute.py`. The robot adds 100 uL elution buffer per well.
-61. Centrifuge filter plus elution plate for 2 min at maximum speed or 2,000 RPM at room temperature.
-62. Confirm approximately 100 uL eluate in each expected elution well.
+60. Resume `5b_norgen_elute.py`. The robot adds **100 uL elution buffer per well**.
+61. Centrifuge filter plus elution plate for **2 min at maximum speed or 2,000 RPM** at room temperature.
+62. Confirm approximately **100 uL eluate** in each expected elution well.
 
 **Pause point:** if processing a 96-sample run and this is batch 1, seal the
 elution plate and refrigerate it while processing batch 2. Continue with the
@@ -360,17 +359,17 @@ Current deck layout for robot p20 mode:
 
 | Slot | Labware | Contents |
 |---|---|---|
-| 2 | `nest_96_wellplate_2ml_deep` | Norgen elution plate |
-| 4 | `nest_12_reservoir_15ml` | DNase master mix in A1 |
+| 2 | `thermoscientificnunc_96_wellplate_2000ul` | Norgen elution plate |
+| 4 | `nest_1_reservoir_195ml` | DNase master mix |
 | 6 | `opentrons_96_tiprack_20ul` | p20 tips |
 
-62. Prepare DNase master mix on ice. Each sample requires 11 uL 10x DNase buffer and 2 uL DNase. Include 10% excess.
-63. If using robot p20 mode, add master mix to A1 of the reservoir at slot 4.
+62. Prepare DNase master mix on ice. Each sample requires **11 uL 10x DNase buffer and 2 uL DNase**. Include **10% excess**.
+63. If using robot p20 mode, add master mix to the single-channel reservoir at slot 4.
 64. Place the Norgen elution plate at slot 2.
-65. Resume `5c_dnase_digestion.py`. The robot adds 13 uL master mix per well.
-66. If using manual mode, add 13 uL DNase master mix to each sample well with a P20 multichannel pipette.
-67. Seal the plate and vortex lightly.
-68. Incubate 20 min at 37 C.
+65. Resume `5c_dnase_digestion.py`. The robot adds **13 uL master mix per well** and performs a high blowout in the same well to clear droplets.
+66. If using manual mode, add **13 uL DNase master mix** to each sample well with a P20 multichannel pipette.
+67. **Seal the plate and vortex lightly**.
+68. Incubate **20 min at 37 C**.
 
 **Pause point:** during the DNase incubation, prepare Zymo filter plate, collection
 plate, binding buffer, EtOH, RNA prep buffer, wash buffer and nuclease-free
@@ -393,52 +392,52 @@ Current deck layout:
 
 | Slot | Labware | Contents |
 |---|---|---|
-| 1 | `nest_12_reservoir_15ml` | RNA prep buffer pos 1, wash buffer pos 2, water pos 3 |
+| 1 | `nest_1_reservoir_195ml` | replace between RNA prep buffer, wash buffer and nuclease-free water |
 | 2 | `custom_zymo_96filterplate` | Zymo filter plate on collection/elution plate |
-| 3 | `nest_96_wellplate_2ml_deep` | post-DNase sample plate |
-| 4 | `nest_12_reservoir_15ml` | binding buffer pos 1, EtOH pos 2 |
+| 3 | `thermoscientificnunc_96_wellplate_2000ul` | post-DNase sample plate |
+| 4 | `nest_1_reservoir_195ml` | replace between binding buffer and EtOH |
 | 6 | `opentrons_96_tiprack_20ul` | p20 tips |
 | 8 | `opentrons_96_tiprack_300ul` | p300 tips |
 | 9 | `opentrons_96_tiprack_300ul` | p300 tips |
 
 69. Place the post-DNase sample plate at slot 3.
-70. Add the binding buffer volume prompted by `6_zymo_clean_conc.py` to position 1 of the slot 4 reservoir. For one 8-well column, this is about 2.2 mL including excess.
+70. Place a 195 mL single-channel reservoir containing the **binding buffer volume prompted by `6_zymo_clean_conc.py`** at slot 4. For one 8-well column, this is about **2.2 mL including excess**.
 71. Load p300 tip racks at slots 8 and 9.
-72. Press Resume in the Opentrons App. The robot adds 226 uL binding buffer per well.
-73. Add the 100% EtOH volume prompted by `6_zymo_clean_conc.py` to position 2 of the slot 4 reservoir. For one 8-well column, this is about 3.3 mL including excess.
-74. Press Resume in the Opentrons App. The robot adds 339 uL EtOH per well.
+72. Press Resume in the Opentrons App. The robot adds **226 uL binding buffer per well** and performs a high blowout in each well.
+73. Replace the slot 4 reservoir with a 195 mL single-channel reservoir containing the **100% EtOH volume prompted by `6_zymo_clean_conc.py`**. For one 8-well column, this is about **3.3 mL including excess**.
+74. Press Resume in the Opentrons App. The robot adds **339 uL EtOH per well** and performs a high blowout in each well.
 75. Remove the sample plate from slot 3.
-76. Seal and vortex at least 30 s.
+76. **Seal and vortex at least 30 s**.
 77. Return sample plate to slot 3.
 78. Place Zymo filter plate on collection plate at slot 2.
-79. Press Resume in the Opentrons App. The current script transfers 3 x 220 uL per well from the NEST 2 mL sample plate to the Zymo filter plate.
+79. Press Resume in the Opentrons App. The current script transfers **3 x 226 uL per well** from the Thermo Scientific Nunc 2 mL sample plate to the Zymo filter plate, dispensing to the Zymo filter at **`top(-5)`** with high blowout.
 
 **Critical step:** the current Step 6 transfer aspirates from `bottom(0)`. Validate
 this height physically before production. If the tip touches the bottom or flow
 is restricted, raise the final aspiration height and accept a small residual
 volume.
 
-80. Centrifuge the Zymo filter plate for 5 min at 3,000-5,000g at room temperature.
+80. Centrifuge the Zymo filter plate for **5 min at 3,000-5,000g** at room temperature.
 81. Discard flow-through and reassemble the filter plate with the collection plate.
-82. Add the RNA prep buffer volume prompted by `6_zymo_clean_conc.py` to position 1 of the slot 1 reservoir. For one 8-well column, this is about 3.8 mL including excess.
-83. Place the filter plate at slot 2 and press Resume in the Opentrons App. The robot adds 400 uL RNA prep buffer per well.
-84. Centrifuge 5 min at 3,000-5,000g.
+82. Place a 195 mL single-channel reservoir containing the **RNA prep buffer volume prompted by `6_zymo_clean_conc.py`** at slot 1. For one 8-well column, this is about **3.8 mL including excess**.
+83. Place the filter plate at slot 2 and press Resume in the Opentrons App. The robot adds **400 uL RNA prep buffer per well** and performs a high blowout in each well.
+84. Centrifuge **5 min at 3,000-5,000g**.
 85. Discard flow-through and reassemble the plate.
-86. Add the wash buffer volume prompted by `6_zymo_clean_conc.py` to position 2 of the slot 1 reservoir. For one 8-well column, this is about 6.7 mL including excess.
-87. Press Resume in the Opentrons App. The robot adds 700 uL wash buffer per well.
-88. Centrifuge 5 min at 3,000-5,000g.
+86. Replace the slot 1 reservoir with a 195 mL single-channel reservoir containing the **wash buffer volume prompted by `6_zymo_clean_conc.py`**. For one 8-well column, this is about **6.7 mL including excess**.
+87. Press Resume in the Opentrons App. The robot adds **700 uL wash buffer per well** and performs a high blowout in each well.
+88. Centrifuge **5 min at 3,000-5,000g**.
 89. Discard flow-through and replace the collection plate with a new one.
-90. Add the wash buffer volume prompted by `6_zymo_clean_conc.py` to position 2 of the slot 1 reservoir. For one 8-well column, this is about 3.8 mL including excess.
-91. Press Resume in the Opentrons App. The robot adds 400 uL wash buffer per well.
-92. Centrifuge 5 min at 3,000-5,000g.
+90. Replace the slot 1 reservoir with a 195 mL single-channel reservoir containing the **wash buffer volume prompted by `6_zymo_clean_conc.py`**. For one 8-well column, this is about **3.8 mL including excess**.
+91. Press Resume in the Opentrons App. The robot adds **400 uL wash buffer per well** and performs a high blowout in each well.
+92. Centrifuge **5 min at 3,000-5,000g**.
 93. Discard flow-through and dispose of the collection plate.
-94. Place the Zymo filter plate on a new final elution plate. Align A1 over A1.
-95. Add 1 mL nuclease-free water to position 3 of the slot 1 reservoir.
-96. If using robot p20 mode, press Resume in the Opentrons App. The robot adds 12.5 uL water per well.
-97. If using manual mode, add 12.5 uL nuclease-free water to each sample well with a P20 multichannel pipette. Wet the filter membrane and avoid splashing the side walls.
-98. Centrifuge filter plus elution plate for 5 min at 3,000-5,000g.
-99. Confirm approximately 12 uL eluate per well.
-100. Aliquot eluted cfRNA as needed and freeze at -80 C.
+94. **Place the Zymo filter plate on a new final elution plate. Align A1 over A1.**
+95. Replace the slot 1 reservoir with a 195 mL single-channel reservoir containing **1 mL nuclease-free water**.
+96. If using robot p20 mode, press Resume in the Opentrons App. The robot adds **12.5 uL water per well** and performs a high blowout in each well.
+97. If using manual mode, add **12.5 uL nuclease-free water** to each sample well with a P20 multichannel pipette. Wet the filter membrane and avoid splashing the side walls.
+98. Centrifuge filter plus elution plate for **5 min at 3,000-5,000g**.
+99. Confirm approximately **12 uL eluate per well**.
+100. Aliquot eluted cfRNA as needed and freeze at **-80 C**.
 
 ## Post-Run Quality Control
 

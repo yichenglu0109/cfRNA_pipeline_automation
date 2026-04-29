@@ -6,10 +6,10 @@ Tips  : p300 ×7 tips (dispensing) + p300 ×48 tips (transfer)
 
 Deck layout
 -----------
-Slot 1 : nest_12_reservoir_15ml   – RNA prep buffer (pos 1) + wash buffer (pos 2) + nuclease-free H2O (pos 3)
+Slot 1 : nest_1_reservoir_195ml             – replace between RNA prep buffer, wash buffer and nuclease-free H2O
 Slot 2 : custom_zymo_96filterplate          – Zymo filter plate (on collection plate → elution plate)
-Slot 3 : nest_96_wellplate_2ml_deep         – sample plate (eluted cfRNA + DNase product)
-Slot 4 : nest_12_reservoir_15ml             – binding buffer (pos 1) + EtOH (pos 2)
+Slot 3 : thermoscientificnunc_96_wellplate_2000ul – sample plate (eluted cfRNA + DNase product)
+Slot 4 : nest_1_reservoir_195ml             – replace between binding buffer and EtOH
 Slot 6 : opentrons_96_tiprack_20ul
 Slot 8 : opentrons_96_tiprack_300ul
 Slot 9 : opentrons_96_tiprack_300ul
@@ -40,7 +40,7 @@ except ImportError:
     TIPS_1000='opentrons_96_filtertiprack_1000ul'
     RESERVOIR_1='nest_1_reservoir_195ml'
     RESERVOIR_12='nest_12_reservoir_15ml'
-    WELLPLATE_2ML='nest_96_wellplate_2ml_deep'
+    WELLPLATE_2ML='thermoscientificnunc_96_wellplate_2000ul'
     PCR_PLATE='nest_96_wellplate_100ul_pcr_full_skirt'
     PLATE_48='custom_48_wellplate_7000ul'       # simulation substitute
     NORGEN_FILTER='custom_norgen_96filterplate'  # simulation substitute
@@ -49,7 +49,7 @@ except ImportError:
 # Pilot defaults; environment variables can still override these per run.
 N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
 FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
-TIP_START=int(os.environ.get('TIP_START','17'))       # p300 rack continues after Step 5
+TIP_START=int(os.environ.get('TIP_START','34'))       # p300 rack continues after Step 5
 P20_TIP_START=int(os.environ.get('P20_TIP_START','1')) # p20 rack continues after Step 5b uses A1
 WELL_START=int(os.environ.get('WELL_START','0'))       # unused by this column-wise script
 
@@ -88,8 +88,8 @@ def run(protocol: protocol_api.ProtocolContext):
     tips_20      = protocol.load_labware('opentrons_96_tiprack_20ul', 6)
     sample_plate = protocol.load_labware(WELLPLATE_2ML,  3)
     filter_plate = protocol.load_labware(ZYMO_FILTER,    2)
-    bind_res     = protocol.load_labware(RESERVOIR_12,   4)
-    wash_res     = protocol.load_labware(RESERVOIR_12,   1)
+    bind_res     = protocol.load_labware(RESERVOIR_1,    4)
+    wash_res     = protocol.load_labware(RESERVOIR_1,    1)
 
     # ── Pipettes ──────────────────────────────────────────────────────────
     p300 = protocol.load_instrument('p300_single_gen2', 'left',  tip_racks=[tips_a, tips_b])
@@ -98,10 +98,10 @@ def run(protocol: protocol_api.ProtocolContext):
     p20.starting_tip = tips_20.wells()[P20_TIP_START]
 
     bind_src  = bind_res.wells()[0]
-    etoh_src  = bind_res.wells()[1]
+    etoh_src  = bind_res.wells()[0]
     prep_src  = wash_res.wells()[0]
-    wash_src  = wash_res.wells()[1]
-    elu_src   = wash_res.wells()[2]   # pos 3 – nuclease-free H2O
+    wash_src  = wash_res.wells()[0]
+    elu_src   = wash_res.wells()[0]
 
     target_sample_cols = sample_plate.columns()[start:stop]
     target_filter_cols = filter_plate.columns()[start:stop]
@@ -111,8 +111,8 @@ def run(protocol: protocol_api.ProtocolContext):
     # ════════════════════════════════════════════════════════════════════
     protocol.pause(
         "STEP 6A  ▶  Place sample plate (post-DNase) at SLOT 3. "
-        f"Add {reagent_ml(n_wells, BIND_VOL)} mL binding buffer to position 1 "
-        "of the reservoir at SLOT 4. "
+        f"Place a 195 mL single-channel reservoir containing {reagent_ml(n_wells, BIND_VOL)} mL "
+        "binding buffer at SLOT 4. "
         "Load 2 full p300 tip racks at SLOTS 8 and 9. Resume."
     )
     iters    = math.ceil(BIND_VOL / 250)
@@ -123,14 +123,15 @@ def run(protocol: protocol_api.ProtocolContext):
             for _ in range(iters):
                 p300.aspirate(per_disp, bind_src.bottom(2))
                 p300.dispense(per_disp, well.bottom(5))
+                p300.blow_out(well.top(-2))
     p300.drop_tip()
 
     # ════════════════════════════════════════════════════════════════════
     # 2. EtOH (339 µL/well; 1 tip reused)
     # ════════════════════════════════════════════════════════════════════
     protocol.pause(
-        f"STEP 6B  ▶  Add {reagent_ml(n_wells, ETOH_VOL2)} mL 100% EtOH "
-        "to position 2 of reservoir at SLOT 4. "
+        f"STEP 6B  ▶  Replace the SLOT 4 reservoir with a 195 mL single-channel reservoir "
+        f"containing {reagent_ml(n_wells, ETOH_VOL2)} mL 100% EtOH. "
         "Resume."
     )
     iters    = math.ceil(ETOH_VOL2 / 250)
@@ -141,6 +142,7 @@ def run(protocol: protocol_api.ProtocolContext):
             for _ in range(iters):
                 p300.aspirate(per_disp, etoh_src.bottom(2))
                 p300.dispense(per_disp, well.bottom(25))
+                p300.blow_out(well.top(-2))
     p300.drop_tip()
 
     # ════════════════════════════════════════════════════════════════════
@@ -156,11 +158,11 @@ def run(protocol: protocol_api.ProtocolContext):
         for src_well, dst_well in zip(src_col, dst_col):
             p300.pick_up_tip()
             for _ in range(ZYMO_LOAD_REPS):   # 3 × 226 µL = 678 µL
-                p300.aspirate(ZYMO_LOAD_VOL, src_well.bottom(0))
+                p300.aspirate(ZYMO_LOAD_VOL, src_well.bottom(0.5))
                 protocol.delay(seconds=0.5)
                 p300.air_gap(20)
-                p300.dispense(ZYMO_LOAD_VOL + 20, dst_well.bottom(10))
-            p300.blow_out(dst_well.bottom(10))
+                p300.dispense(ZYMO_LOAD_VOL + 20, dst_well.top(-5))
+                p300.blow_out(dst_well.top(-5))
             p300.drop_tip()
 
     protocol.comment(
@@ -173,8 +175,8 @@ def run(protocol: protocol_api.ProtocolContext):
     # ════════════════════════════════════════════════════════════════════
     protocol.pause(
         "STEP 6D  ▶  Place filter plate at SLOT 2. "
-        f"Add {reagent_ml(n_wells, PREP_VOL)} mL RNA prep buffer to position 1 "
-        "of reservoir at SLOT 1. "
+        f"Place a 195 mL single-channel reservoir containing {reagent_ml(n_wells, PREP_VOL)} mL "
+        "RNA prep buffer at SLOT 1. "
         "Resume."
     )
     iters    = math.ceil(PREP_VOL / 250)
@@ -185,6 +187,7 @@ def run(protocol: protocol_api.ProtocolContext):
             for _ in range(iters):
                 p300.aspirate(per_disp, prep_src.bottom(2))
                 p300.dispense(per_disp, well.bottom(22))
+                p300.blow_out(well.top(-2))
     p300.drop_tip()
     protocol.comment(
         "Centrifuge 5 min at 3,000–5,000 g. Discard flow-through."
@@ -195,8 +198,8 @@ def run(protocol: protocol_api.ProtocolContext):
     # ════════════════════════════════════════════════════════════════════
     protocol.pause(
         "STEP 6E  ▶  Place filter plate at SLOT 2. "
-        f"Add {reagent_ml(n_wells, WASH1_VOL)} mL wash buffer to position 2 "
-        "of reservoir at SLOT 1. "
+        f"Replace the SLOT 1 reservoir with a 195 mL single-channel reservoir containing "
+        f"{reagent_ml(n_wells, WASH1_VOL)} mL wash buffer. "
         "Resume."
     )
     iters    = math.ceil(WASH1_VOL / 250)
@@ -207,6 +210,7 @@ def run(protocol: protocol_api.ProtocolContext):
             for _ in range(iters):
                 p300.aspirate(per_disp, wash_src.bottom(2))
                 p300.dispense(per_disp, well.bottom(22))
+                p300.blow_out(well.top(-2))
     p300.drop_tip()
     protocol.comment(
         "Centrifuge 5 min at 3,000–5,000 g. Discard flow-through. "
@@ -218,8 +222,8 @@ def run(protocol: protocol_api.ProtocolContext):
     # ════════════════════════════════════════════════════════════════════
     protocol.pause(
         "STEP 6F  ▶  Place filter plate at SLOT 2. "
-        f"Add {reagent_ml(n_wells, WASH2_VOL)} mL wash buffer to position 2 "
-        "of reservoir at SLOT 1. "
+        f"Replace the SLOT 1 reservoir with a 195 mL single-channel reservoir containing "
+        f"{reagent_ml(n_wells, WASH2_VOL)} mL wash buffer. "
         "Resume."
     )
     iters    = math.ceil(WASH2_VOL / 250)
@@ -230,6 +234,7 @@ def run(protocol: protocol_api.ProtocolContext):
             for _ in range(iters):
                 p300.aspirate(per_disp, wash_src.bottom(2))
                 p300.dispense(per_disp, well.bottom(22))
+                p300.blow_out(well.top(-2))
     p300.drop_tip()
     protocol.comment(
         "Centrifuge 5 min at 3,000–5,000 g. Discard flow-through AND collection plate. "
@@ -242,15 +247,17 @@ def run(protocol: protocol_api.ProtocolContext):
     protocol.pause(
         "STEP 6G  ▶  Discard collection plate. Place filter plate on a NEW "
         "96-well PCR plate (elution plate) at SLOT 2. "
-        "Add 1 mL nuclease-free H2O to position 3 of reservoir at SLOT 1. "
+        "Replace the SLOT 1 reservoir with a 195 mL single-channel reservoir containing "
+        "1 mL nuclease-free H2O. "
         "Resume."
     )
 
     p20.pick_up_tip()
     for col in target_filter_cols:
         for well in col:
-            p20.aspirate(12.5, elu_src.bottom(2))
+            p20.aspirate(12.5, elu_src.bottom(1))
             p20.dispense(12.5, well.bottom(5))
+            p20.blow_out(well.top(-2))
     p20.drop_tip()
 
     protocol.comment(

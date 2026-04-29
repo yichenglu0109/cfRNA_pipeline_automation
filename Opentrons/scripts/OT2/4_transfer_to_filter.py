@@ -44,7 +44,7 @@ except ImportError:
 # Pilot defaults; environment variables can still override these per run.
 N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
 FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
-TIP_START=int(os.environ.get('TIP_START','0'))    # fresh p300 rack in slot 8
+TIP_START=int(os.environ.get('TIP_START','22'))    # fresh p300 rack in slot 8
 WELL_START=int(os.environ.get('WELL_START','0'))  # 0=A1, 1=B1, ..., 8=A2
 
 from opentrons import protocol_api
@@ -94,12 +94,12 @@ def run(protocol: protocol_api.ProtocolContext):
                 f"Remove seal from column {src_col_idx + 1} only. Resume."
             )
         p300.pick_up_tip()
-        p300.mix(2, 250, src_well.bottom(2))
-        for _ in range(3):   # 3 × 200 µL + 10 µL air gap = 600 µL sample per well
-            p300.aspirate(200, src_well.bottom(1.7), rate=0.75)
+        p300.mix(3, 250, src_well.bottom(2))
+        for _ in range(3):   # 3 × 230 µL + 10 µL air gap = 690 µL slurry/sample per well
+            p300.aspirate(230, src_well.bottom(1.7), rate=0.75)
             protocol.delay(seconds=0.5)
             p300.air_gap(10)
-            p300.dispense(210, dst_well.top(-5), rate=0.5)
+            p300.dispense(240, dst_well.top(-5), rate=0.5)
             p300.blow_out(dst_well.top(-5))
         p300.drop_tip()
 
