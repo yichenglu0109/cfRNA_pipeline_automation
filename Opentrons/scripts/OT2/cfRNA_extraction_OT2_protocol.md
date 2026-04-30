@@ -1,7 +1,7 @@
 # Semi-Automated cfRNA Extraction on OT-2
 
 Author: Peter Lu  
-Date: 2026-04-25
+Date: 2026-04-29
 
 The operating protocol for the OT-2 scripts in this directory. It is intended to be used by an operator standing at the robot. The OT-2 performs repetitive liquid handling; the user adds reagents, moves plates, centrifuges plates, seals/unseals plates, vortexes samples and verifies setup at each pause.
 
@@ -68,7 +68,7 @@ script.
 Most current scripts use:
 
 - `p300_single_gen2` on the left mount
-- `p20_single_gen2` on the right mount for DNase and final 12.5 uL elution
+- `p20_single_gen2` on the right mount for DNase and final 15 uL elution
 
 ### Available hardware configuration
 
@@ -82,7 +82,7 @@ division of labor:
 
 - p1000 single: 1.8 mL lysis, 3 mL EtOH, high-volume 48-well additions and conservative decant/removal.
 - p300 multi: full-column additions and transfers in 48-well, Norgen and Zymo filter plates.
-- Manual P20 multichannel: DNase 13 uL/well and final 12.5 uL/well nuclease-free water addition.
+- Manual P20 multichannel: DNase 13 uL/well and final 15 uL/well nuclease-free water addition.
 
 **Critical step:** do not run a script with a pipette configuration that does not
 match the script. The robot will not automatically translate p300-single logic
@@ -123,7 +123,7 @@ volume. The current scripts use the following defaults:
 | RNA prep buffer | **400 uL/well** |
 | Zymo wash 1 | **700 uL/well** |
 | Zymo wash 2 | **400 uL/well** |
-| Final nuclease-free water | **12.5 uL/well** |
+| Final nuclease-free water | **15 uL/well** |
 
 **Critical step:** pre-warmed slurry and lysis buffer can crystallize or clog tips
 if cooled. Work promptly after vortexing and loading these reagents.
@@ -147,9 +147,9 @@ Validate these low/sensitive positions before production:
 | Step | Operation | Position |
 |---|---|---|
 | Step 1 | slurry aspiration | reservoir **`bottom(2)`** |
-| Step 3 | decant | 48-well staged heights down to **`bottom(3)`** |
+| Step 3 | decant | 48-well staged heights down to **`bottom(4)`** |
 | Step 4 | sample transfer | 48-well **`bottom(1.7)`** |
-| Step 6 | Zymo transfer source | Thermo Scientific Nunc 2 mL plate **`bottom(0)`** |
+| Step 6 | Zymo transfer source | Thermo Scientific Nunc 2 mL plate **`bottom(0.3)`** |
 
 ## Procedure
 
@@ -242,7 +242,7 @@ gains available.
 23. Return the plate to slot 2 unsealed.
 24. Place an open liquid-waste container at slot 5.
 25. Resume the robot.
-26. The robot decants supernatant from each target well using staged heights: **37, 34, 30, 26, 22, 18, 14, 10, 8, 6, 4 and 3 mm above bottom**. Each height is used for **two 250 uL aspirations at rate 0.5**.
+26. The robot decants supernatant from each target well using staged heights: **37, 34, 30, 26, 22, 18, 14, 10, 8, 6, 5 and 4 mm above bottom**. Each height is used for **two 250 uL aspirations at rate 0.5**.
 
 **Critical step:** decant is pellet-sensitive. If using a modified p1000 or
 multi-channel decant, validate with mock slurry first. Do not optimize this step
@@ -366,7 +366,8 @@ Current deck layout for robot p20 mode:
 62. Prepare DNase master mix on ice. Each sample requires **11 uL 10x DNase buffer and 2 uL DNase**. Include **10% excess**.
 63. If using robot p20 mode, add master mix to the single-channel reservoir at slot 4.
 64. Place the Norgen elution plate at slot 2.
-65. Resume `5c_dnase_digestion.py`. The robot adds **13 uL master mix per well** and performs a high blowout in the same well to clear droplets.
+65. Resume `5c_dnase_digestion.py`. The robot adds **13 uL master mix per well** at `bottom(5)` and performs a blowout at `bottom(6)` in the same well.
+    **Recommend using manual P20 for this step.**
 66. If using manual mode, add **13 uL DNase master mix** to each sample well with a P20 multichannel pipette.
 67. **Seal the plate and vortex lightly**.
 68. Incubate **20 min at 37 C**.
@@ -381,7 +382,7 @@ water for Step 6.
 script.
 **Estimated p300 multichannel version:** about 1-1.5 h for 48 samples, assuming
 binding, EtOH, Zymo loading, prep buffer and wash additions are converted to
-column-wise operations. Final 12.5 uL elution still requires p20 or manual P20
+column-wise operations. Final 15 uL elution still requires p20 or manual P20
 multichannel.
 
 #### Step 6 (`6_zymo_clean_conc.py`): Zymo cleanup
@@ -410,9 +411,9 @@ Current deck layout:
 76. **Seal and vortex at least 30 s**.
 77. Return sample plate to slot 3.
 78. Place Zymo filter plate on collection plate at slot 2.
-79. Press Resume in the Opentrons App. The current script transfers **3 x 226 uL per well** from the Thermo Scientific Nunc 2 mL sample plate to the Zymo filter plate, dispensing to the Zymo filter at **`top(-5)`** with high blowout.
+79. Press Resume in the Opentrons App. The current script transfers **3 x 226 uL per well** from the Thermo Scientific Nunc 2 mL sample plate at **`bottom(0.3)`** to the Zymo filter plate, dispensing to the Zymo filter at **`top(-5)`** with high blowout.
 
-**Critical step:** the current Step 6 transfer aspirates from `bottom(0)`. Validate
+**Critical step:** the current Step 6 transfer aspirates from `bottom(0.3)`. Validate
 this height physically before production. If the tip touches the bottom or flow
 is restricted, raise the final aspiration height and accept a small residual
 volume.
@@ -433,10 +434,11 @@ volume.
 93. Discard flow-through and dispose of the collection plate.
 94. **Place the Zymo filter plate on a new final elution plate. Align A1 over A1.**
 95. Replace the slot 1 reservoir with a 195 mL single-channel reservoir containing **1 mL nuclease-free water**.
-96. If using robot p20 mode, press Resume in the Opentrons App. The robot adds **12.5 uL water per well** and performs a high blowout in each well.
-97. If using manual mode, add **12.5 uL nuclease-free water** to each sample well with a P20 multichannel pipette. Wet the filter membrane and avoid splashing the side walls.
+96. If using robot p20 mode, press Resume in the Opentrons App. The robot adds **15 uL water per well** and performs a high blowout in each well.
+    **Recommend using manual P20 for this step.**
+97. If using manual mode, add **15 uL nuclease-free water** to each sample well with a P20 multichannel pipette. Wet the filter membrane and avoid splashing the side walls.
 98. Centrifuge filter plus elution plate for **5 min at 3,000-5,000g**.
-99. Confirm approximately **12 uL eluate per well**.
+99. Confirm approximately **15 uL loaded per well**; recovered eluate volume may be lower because some liquid can remain in the column.
 100. Aliquot eluted cfRNA as needed and freeze at **-80 C**.
 
 ## Post-Run Quality Control

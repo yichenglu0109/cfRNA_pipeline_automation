@@ -1,0 +1,209 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><title>OT2_USED_PLATE_WATER_QC</title>
+<style>
+@page { margin: 0.45in; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-size: 9.4pt; line-height: 1.22; color: #111; }
+h1 { font-size: 18pt; margin: 0 0 8pt; }
+h2 { font-size: 12.8pt; margin: 10pt 0 4pt; border-bottom: 1px solid #ddd; padding-bottom: 2pt; }
+h3 { font-size: 10.8pt; margin: 8pt 0 3pt; }
+h4 { font-size: 9.8pt; margin: 6pt 0 2pt; }
+p { margin: 0 0 4pt; }
+ul, ol { margin: 0 0 5pt 17pt; padding: 0; }
+li { margin: 1pt 0; }
+table { border-collapse: collapse; width: 100%; margin: 5pt 0 6pt; page-break-inside: auto; }
+th, td { border: 1px solid #bbb; padding: 2.5pt 3pt; vertical-align: top; }
+th { background: #eee; font-weight: 700; }
+code { font-family: Menlo, Consolas, monospace; font-size: 8.2pt; background: #f4f4f4; padding: 0 1pt; }
+pre { background: #f4f4f4; padding: 5pt; overflow-wrap: break-word; white-space: pre-wrap; }
+</style></head><body>
+<h1>Used Plate Water QC for OT-2 cfRNA Pilot</h1>
+<p>Author: Peter Lu Date: 2026-04-27</p>
+<p>This is a low-cost process rehearsal using used Norgen/Zymo filter plates and water or dyed water. It checks plate alignment, well mapping, liquid handling, centrifuge handoffs, flow-through and tip-start logic before spending fresh kit wells or real samples.</p>
+<p>Do not use used filter plates for real pilot samples. This QC only validates the physical workflow.</p>
+<h2>Goal</h2>
+<p>Confirm that the current OT-2 pilot workflow can run through the expected 2-column layout without obvious mechanical or operator-handling failures.</p>
+<p>Primary checks:</p>
+<ol>
+<li>OT-2 dispenses into the intended wells.</li>
+<li>Norgen and Zymo filter wells are centered after the custom labware offset changes.</li>
+<li>Transfer, wash and elution liquids flow through the used filter plates.</li>
+<li>Centrifuge and plate-swap pauses are understandable.</li>
+<li>Tip usage follows the pilot tip-start map.</li>
+</ol>
+<h2>Materials</h2>
+<table>
+<tr><th>Item</th><th>Purpose</th></tr>
+<tr><td>Used Norgen 96 filter plate + collection plate</td><td>Step 4/5 transfer and flow-through rehearsal</td></tr>
+<tr><td>Used Zymo 96 filter plate + collection plate</td><td>Step 6 flow-through rehearsal</td></tr>
+<tr><td>48-well deep-well plate</td><td>Mock extraction plate</td></tr>
+<tr><td>NEST 96-well 2 mL deep-well plate</td><td>Norgen elution / DNase / Zymo input plate</td></tr>
+<tr><td>96-well PCR plate or clean receiver plate</td><td>Final Zymo elution receiver</td></tr>
+<tr><td>p300 tip racks</td><td>Same locations as pilot protocol</td></tr>
+<tr><td>p20 tip rack</td><td>Same location as pilot protocol</td></tr>
+<tr><td>Water or nuclease-free water</td><td>Mock reagent/sample</td></tr>
+<tr><td>Food dye or tracking dye, optional</td><td>Visual confirmation of liquid placement</td></tr>
+<tr><td>Plate seals</td><td>Vortex/centrifuge handling rehearsal</td></tr>
+<tr><td>Camera or phone</td><td>Photo documentation</td></tr>
+</table>
+<p>Optional: use real Norgen slurry in 2-4 wells if you specifically want to test pellet/decant behavior. Do not use real samples for this QC.</p>
+<h2>Test Layout</h2>
+<p>Use the same layout as the 16-well pilot, but with water or dyed water.</p>
+<table>
+<tr><th>Column</th><th>Meaning</th><th>Wells</th></tr>
+<tr><td>Column 1</td><td>OT-2 path</td><td>A1-H1</td></tr>
+<tr><td>Column 2</td><td>Manual path</td><td>A2-H2</td></tr>
+</table>
+<p>Run OT-2 scripts on column 1. Process column 2 manually with matching water additions, plate moves and centrifugation steps so the rehearsal reflects manual versus OT-2 workflow comparison.</p>
+<h2>Run Settings</h2>
+<p>Use the same pilot defaults:</p>
+<table>
+<tr><th>Step</th><th>Script</th><th>N_SAMPLES</th><th>WELL_START</th><th>FILTER_COL_START</th><th>TIP_START</th><th>P20_TIP_START</th></tr>
+<tr><td>1</td><td><code>1_add_slurry_lysis.py</code></td><td>8</td><td>0</td><td>0</td><td>0</td><td>N/A</td></tr>
+<tr><td>3</td><td><code>3_etoh_centrifuge.py</code></td><td>8</td><td>0</td><td>0</td><td>2</td><td>N/A</td></tr>
+<tr><td>4</td><td><code>4_transfer_to_filter.py</code></td><td>8</td><td>0</td><td>0</td><td>0</td><td>N/A</td></tr>
+<tr><td>5</td><td><code>5_norgen_wash_elute.py</code></td><td>8</td><td>ignored</td><td>0</td><td>13</td><td>N/A</td></tr>
+<tr><td>5b</td><td><code>5b_dnase_digestion.py</code></td><td>8</td><td>ignored</td><td>0</td><td>0</td><td>0</td></tr>
+<tr><td>6</td><td><code>6_zymo_clean_conc.py</code></td><td>8</td><td>ignored</td><td>0</td><td>17</td><td>1</td></tr>
+</table>
+<h2>Procedure</h2>
+<h3>1. Setup Check</h3>
+<ol>
+<li>Install the updated custom Norgen labware definition on the OT-2.</li>
+<li>Place used Norgen and Zymo plates on their matching collection/receiver plates.</li>
+<li>Mark A1 clearly on every plate.</li>
+<li>Confirm plates sit flat on adapters, collection plates and centrifuge buckets.</li>
+<li>Prepare water or lightly dyed water in the reservoirs used by the scripts.</li>
+</ol>
+<p>Record:</p>
+<table>
+<tr><th>Check</th><th>Pass/Fail</th><th>Notes</th></tr>
+<tr><td>Norgen plate sits flat</td><td></td><td></td></tr>
+<tr><td>Zymo plate sits flat</td><td></td><td></td></tr>
+<tr><td>A1 orientation clear</td><td></td><td></td></tr>
+<tr><td>No visibly broken pilot-column wells</td><td></td><td></td></tr>
+</table>
+<h3>2. Step 1 Water Addition</h3>
+<p>Run:</p>
+<pre><code>N_SAMPLES=8 WELL_START=0 TIP_START=0 opentrons_execute 1_add_slurry_lysis.py</code></pre>
+<p>Use water instead of slurry and lysis buffer.</p>
+<p>Check:</p>
+<ul>
+<li>A1-H1 in the 48-well plate receive liquid.</li>
+<li>No liquid appears in unintended wells.</li>
+<li>Dispense height does not splash or hit the well wall badly.</li>
+<li>Tip pickup starts at A1 and then B1.</li>
+</ul>
+<h3>3. Step 3 Decant Rehearsal</h3>
+<p>Run:</p>
+<pre><code>N_SAMPLES=8 WELL_START=0 TIP_START=2 opentrons_execute 3_etoh_centrifuge.py</code></pre>
+<p>Use water or dyed water in place of EtOH/re-lysis/EtOH wash. If testing pellet behavior, add real Norgen slurry to 2-4 wells before running this step.</p>
+<p>Check:</p>
+<ul>
+<li>Added liquid does not overflow the 48-well plate.</li>
+<li>After centrifuge pause, the plate can be returned without orientation confusion.</li>
+<li>Decant removes liquid from A1-H1 only.</li>
+<li>Residual volume after decant is consistent across wells.</li>
+<li>Tip does not visibly scrape the bottom or disturb pellet/mock pellet.</li>
+<li>Liquid trash does not splash.</li>
+</ul>
+<p>Record:</p>
+<table>
+<tr><th>Well</th><th>Residual liquid low/medium/high</th><th>Pellet disturbed?</th><th>Notes</th></tr>
+<tr><td>A1</td><td></td><td></td><td></td></tr>
+<tr><td>B1</td><td></td><td></td><td></td></tr>
+<tr><td>C1</td><td></td><td></td><td></td></tr>
+<tr><td>D1</td><td></td><td></td><td></td></tr>
+<tr><td>E1</td><td></td><td></td><td></td></tr>
+<tr><td>F1</td><td></td><td></td><td></td></tr>
+<tr><td>G1</td><td></td><td></td><td></td></tr>
+<tr><td>H1</td><td></td><td></td><td></td></tr>
+</table>
+<h3>4. Step 4 Transfer to Used Norgen Plate</h3>
+<p>Run:</p>
+<pre><code>N_SAMPLES=8 WELL_START=0 FILTER_COL_START=0 TIP_START=0 opentrons_execute 4_transfer_to_filter.py</code></pre>
+<p>Check:</p>
+<ul>
+<li>A1-H1 of the used Norgen plate receive liquid.</li>
+<li>Tip is centered in Norgen wells after the labware x/y offset change.</li>
+<li>Liquid lands in the well/membrane area, not on the edge.</li>
+<li>No visible splash or cross-well contamination.</li>
+</ul>
+<p>Photo targets:</p>
+<table>
+<tr><th>Position</th><th>Photo taken?</th><th>Centered?</th><th>Notes</th></tr>
+<tr><td>Norgen A1</td><td></td><td></td><td></td></tr>
+<tr><td>Norgen H1</td><td></td><td></td><td></td></tr>
+<tr><td>Norgen A2</td><td></td><td></td><td></td></tr>
+<tr><td>Norgen H2</td><td></td><td></td><td></td></tr>
+</table>
+<p>Before Step 5, manually load matching water volume into Norgen column 2. From this point onward, keep column 2 manual: add wash, elution, DNase and Zymo reagents by hand while the OT-2 scripts process column 1.</p>
+<h3>5. Step 5 Norgen Wash/Elute Rehearsal</h3>
+<p>Run:</p>
+<pre><code>N_SAMPLES=8 FILTER_COL_START=0 TIP_START=13 opentrons_execute 5_norgen_wash_elute.py</code></pre>
+<p>Use water instead of Norgen wash buffer and elution buffer.</p>
+<p>Check:</p>
+<ul>
+<li>OT-2 wash additions go to column 1 only.</li>
+<li>Manual wash additions go to column 2 only.</li>
+<li>Used Norgen filter wells flow through after centrifugation.</li>
+<li>Collection plate wells match the expected columns.</li>
+<li>No obvious clogged wells or liquid retained in only one row.</li>
+<li>OT-2 elution water is added to column 1 and manual elution water is added to column 2.</li>
+<li>Elution receiver plate preserves the same well map.</li>
+</ul>
+<p>Record:</p>
+<table>
+<tr><th>Column</th><th>Flow-through present?</th><th>Retained liquid?</th><th>Notes</th></tr>
+<tr><td>1</td><td></td><td></td><td></td></tr>
+<tr><td>2</td><td></td><td></td><td></td></tr>
+</table>
+<h3>6. Step 5b DNase Addition Mock</h3>
+<p>Run:</p>
+<pre><code>N_SAMPLES=8 FILTER_COL_START=0 TIP_START=0 opentrons_execute 5b_dnase_digestion.py</code></pre>
+<p>Use water instead of DNase master mix.</p>
+<p>Check:</p>
+<ul>
+<li>p20 aspirates from reservoir A1.</li>
+<li>OT-2 13 uL additions are visible or traceable in column 1.</li>
+<li>Manual 13 uL additions are visible or traceable in column 2.</li>
+<li>Tip does not touch the well bottom aggressively.</li>
+<li>p20 uses A1.</li>
+</ul>
+<h3>7. Step 6 Zymo Rehearsal</h3>
+<p>Run:</p>
+<pre><code>N_SAMPLES=8 FILTER_COL_START=0 TIP_START=17 P20_TIP_START=1 opentrons_execute 6_zymo_clean_conc.py</code></pre>
+<p>Use water or dyed water instead of binding buffer, EtOH, RNA prep buffer, wash buffer and nuclease-free water.</p>
+<p>Check:</p>
+<ul>
+<li>OT-2 sample plate additions go to column 1 only; manual additions go to column 2 only.</li>
+<li>Transfer from sample plate to used Zymo filter plate preserves the map for both workflows.</li>
+<li>OT-2 Zymo filter additions go to column 1 only; manual additions go to column 2 only.</li>
+<li>Used Zymo wells flow through after centrifugation.</li>
+<li>Final 15 uL p20 water addition lands near the membrane center.</li>
+<li>Final receiver plate is correctly aligned.</li>
+<li>p300 starts at expected tip and p20 starts at B1 if the Step 5b rack is reused.</li>
+</ul>
+<h2>Pass/Fail Criteria</h2>
+<p>Pass the rehearsal if all are true:</p>
+<ol>
+<li>All intended wells in columns 1-2 receive liquid by the intended method.</li>
+<li>No unintended wells receive liquid.</li>
+<li>Norgen and Zymo filter targets are visually centered.</li>
+<li>No major splash, overflow or cross-well contamination is observed.</li>
+<li>Used filter plates show flow-through in the expected collection wells.</li>
+<li>Decant does not visibly scrape or disturb the bottom/pellet region.</li>
+<li>Tip usage follows the expected tip-start map.</li>
+<li>Operator pauses are understandable and plate orientation remains clear.</li>
+</ol>
+<p>If any item fails, record the exact well, step, photo and suspected cause before changing scripts or labware definitions.</p>
+<h2>Photo Log</h2>
+<table>
+<tr><th>Step</th><th>Required photo</th><th>Done?</th><th>Notes</th></tr>
+<tr><td>Setup</td><td>Norgen and Zymo A1 orientation</td><td></td><td></td></tr>
+<tr><td>Step 3</td><td>48-well plate after decant</td><td></td><td></td></tr>
+<tr><td>Step 4</td><td>Norgen A1-H1 after transfer</td><td></td><td></td></tr>
+<tr><td>Step 5</td><td>Norgen collection plate after spin</td><td></td><td></td></tr>
+<tr><td>Step 6</td><td>Zymo filter plate after transfer</td><td></td><td></td></tr>
+<tr><td>Step 6</td><td>Final receiver plate after elution mock</td><td></td><td></td></tr>
+</table>
+</body></html>

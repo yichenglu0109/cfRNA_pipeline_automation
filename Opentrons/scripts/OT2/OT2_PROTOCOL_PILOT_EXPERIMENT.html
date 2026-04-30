@@ -1,0 +1,122 @@
+<!doctype html><html><head><meta charset="utf-8"><title>OT2_PROTOCOL_PILOT_EXPERIMENT</title><style>
+@page { margin: 0.45in; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-size: 9.4pt; line-height: 1.22; color: #111; }
+h1 { font-size: 18pt; margin: 0 0 8pt; }
+h2 { font-size: 12.8pt; margin: 10pt 0 4pt; border-bottom: 1px solid #ddd; padding-bottom: 2pt; }
+h3 { font-size: 10.8pt; margin: 8pt 0 3pt; }
+h4 { font-size: 9.8pt; margin: 6pt 0 2pt; }
+p { margin: 0 0 4pt; }
+ul, ol { margin: 0 0 5pt 17pt; padding: 0; }
+li { margin: 1pt 0; }
+table { border-collapse: collapse; width: 100%; margin: 5pt 0 6pt; page-break-inside: auto; }
+th, td { border: 1px solid #bbb; padding: 2.5pt 3pt; vertical-align: top; }
+th { background: #eee; font-weight: 700; }
+code { font-family: Menlo, Consolas, monospace; font-size: 8.2pt; background: #f4f4f4; padding: 0 1pt; }
+pre { background: #f4f4f4; padding: 5pt; overflow-wrap: break-word; white-space: pre-wrap; }
+strong { font-weight: 800; }
+</style></head><body><h1>Pilot Experiment: Manual vs Semi-Automated OT-2 cfRNA Extraction</h1>
+<p>Author: Peter Lu</p>
+<p>Date: 2026-04-29</p>
+<p>This pilot experiment compares the current semi-automated OT-2 cfRNA extraction workflow against manual extraction using matched aliquots from the same source samples. To conserve kit plates, the pilot is designed as a same-plate performance comparison using the same Norgen and Zymo plate workflow. The goal is to evaluate extraction performance and reproducibility, not total protocol runtime.</p>
+<h2>Objective</h2>
+<p>Evaluate whether the current OT-2 protocol produces cfRNA yield and quality comparable to manual extraction when starting from the same input material.</p>
+<p>Primary questions:</p>
+<ol>
+<li>Does the OT-2 workflow recover similar RNA concentration compared with manual extraction?</li>
+<li>Is replicate variability similar between OT-2 and manual extraction?</li>
+<li>Are there obvious OT-2-specific failures, such as low eluate volume, clogging, poor transfer or well-to-well inconsistency?</li>
+</ol>
+<h2>Experimental Design</h2>
+<p>Use two source samples:</p>
+<ol>
+<li>Fake cfRNA mimic sample from previous mouse tissue extraction.</li>
+<li>Human blood/plasma sample purchased from a blood bank.</li>
+</ol>
+<p>Each source sample is split into matched aliquots and assigned to manual or semi-automated extraction. Both the fake cfRNA mimic source and the human plasma source use two extraction sample wells per method. The remaining wells are filled with water negative controls so each method has a 1:1 sample-to-water layout. Sample and water wells are alternated by row to help assess contamination.</p>
+<table><thead><tr><th>Source sample</th><th>Manual extraction</th><th>OT-2 semi-automated extraction</th><th>Total</th></tr></thead><tbody><tr><td>Fake cfRNA mimic</td><td>2 replicates + 2 water controls</td><td>2 replicates + 2 water controls</td><td>8 wells</td></tr><tr><td>Human blood/plasma</td><td>2 replicates + 2 water controls</td><td>2 replicates + 2 water controls</td><td>8 wells</td></tr><tr><td>Total</td><td>8 wells</td><td>8 wells</td><td>16 wells</td></tr></tbody></table>
+<h2>Primary Endpoint</h2>
+<p>Analytical performance and reproducibility:</p>
+<ul>
+<li>RNA concentration after extraction.</li>
+<li>Bioanalyzer RNA profile.</li>
+<li>Replicate coefficient of variation within each method.</li>
+<li>OT-2/manual recovery ratio for each source sample.</li>
+<li>Visible or operational failures during extraction.</li>
+</ul>
+<p>Runtime should be recorded only as a descriptive note because manual and OT-2 samples share plates, centrifugation and downstream processing.</p>
+<h2>Sample Aliquoting</h2>
+<p>For the fake cfRNA mimic source sample:</p>
+<ol>
+<li>Thaw or prepare the source sample consistently.</li>
+<li>Mix thoroughly before aliquoting.</li>
+<li>Prepare 4 equal-volume sample aliquots for extraction.</li>
+<li>Randomly assign 2 aliquots to manual extraction and 2 aliquots to OT-2 extraction.</li>
+<li>Prepare two water negative-control wells for each method.</li>
+</ol>
+<p>For the human blood/plasma source sample:</p>
+<ol>
+<li>Thaw or prepare the source sample consistently.</li>
+<li>Mix thoroughly before aliquoting.</li>
+<li>Prepare 4 equal-volume aliquots for extraction.</li>
+<li>Randomly assign 2 aliquots to manual extraction and 2 aliquots to OT-2 extraction.</li>
+<li>Prepare two water negative-control wells for each method to fill the remaining human plasma block wells.</li>
+<li>Keep aliquots on the same temperature schedule before extraction.</li>
+</ol>
+<p>Do not assign the first aliquots to one method and the last aliquots to the other method. Randomization reduces bias from mixing, settling or aliquot order.</p>
+<p>Suggested labeling:</p>
+<table><thead><tr><th>Source</th><th>Manual replicates</th><th>OT-2 replicates</th></tr></thead><tbody><tr><td>Fake cfRNA mimic</td><td>Mimic-M1, Mimic-M2, M-NTC1, M-NTC2</td><td>Mimic-O1, Mimic-O2, O-NTC1, O-NTC2</td></tr><tr><td>Human blood/plasma</td><td>Human-M1, Human-M2, M-NTC3, M-NTC4</td><td>Human-O1, Human-O2, O-NTC3, O-NTC4</td></tr></tbody></table>
+<h2>Plate Strategy</h2>
+<p>Use one shared Norgen filter plate and one shared Zymo filter plate for this pilot. This conserves kit components and reduces reagent lot, centrifuge, incubation and downstream batch effects.</p>
+<p>Recommended layout:</p>
+<table><thead><tr><th>Plate well</th><th>Sample ID</th><th>Method</th><th>Source</th></tr></thead><tbody><tr><td>A1</td><td>Mimic-O1</td><td>OT-2</td><td>Fake cfRNA mimic</td></tr><tr><td>B1</td><td>O-NTC1</td><td>OT-2</td><td>Water negative control</td></tr><tr><td>C1</td><td>Mimic-O2</td><td>OT-2</td><td>Fake cfRNA mimic</td></tr><tr><td>D1</td><td>O-NTC2</td><td>OT-2</td><td>Water negative control</td></tr><tr><td>E1</td><td>Human-O1</td><td>OT-2</td><td>Human blood/plasma</td></tr><tr><td>F1</td><td>O-NTC3</td><td>OT-2</td><td>Water negative control</td></tr><tr><td>G1</td><td>Human-O2</td><td>OT-2</td><td>Human blood/plasma</td></tr><tr><td>H1</td><td>O-NTC4</td><td>OT-2</td><td>Water negative control</td></tr><tr><td>A3</td><td>Mimic-M1</td><td>Manual</td><td>Fake cfRNA mimic</td></tr><tr><td>B3</td><td>M-NTC1</td><td>Manual</td><td>Water negative control</td></tr><tr><td>C3</td><td>Mimic-M2</td><td>Manual</td><td>Fake cfRNA mimic</td></tr><tr><td>D3</td><td>M-NTC2</td><td>Manual</td><td>Water negative control</td></tr><tr><td>E3</td><td>Human-M1</td><td>Manual</td><td>Human blood/plasma</td></tr><tr><td>F3</td><td>M-NTC3</td><td>Manual</td><td>Water negative control</td></tr><tr><td>G3</td><td>Human-M2</td><td>Manual</td><td>Human blood/plasma</td></tr><tr><td>H3</td><td>M-NTC4</td><td>Manual</td><td>Water negative control</td></tr></tbody></table>
+<p>Column 1 is reserved for the OT-2 workflow. Column 2 is intentionally left empty as a spacer column. Column 3 is reserved for the manual workflow. To compare manual versus OT-2 liquid handling while limiting manual influence on the OT-2 column, the OT-2 scripts process column 1 only; process column 3 manually through the matching Norgen wash/elution, DNase and Zymo cleanup steps.</p>
+<p>Use only unused wells for each condition. Do not reuse wells that have already received sample, buffer, wash or elution liquid. The remaining unused wells on the same plates may be reserved for same-day optimization or additional pilot samples, but should not be used later for precious production samples.</p>
+<p>Keep centrifugation and downstream QC batch timing matched whenever possible, but do not let the OT-2 add downstream reagents to the manual column if the goal is full manual versus OT-2 workflow comparison.</p>
+<h2>Controls</h2>
+<ol>
+<li>Water negative controls for the fake cfRNA mimic source-method block: M-NTC1, M-NTC2, O-NTC1 and O-NTC2.</li>
+<li>Water negative controls for the human plasma source-method block: M-NTC3, M-NTC4, O-NTC3 and O-NTC4.</li>
+<li>Optional spike-in or positive control if available.</li>
+<li>No-template control for downstream qPCR, if used.</li>
+</ol>
+<p>Water negative controls should receive the same extraction reagents and plate handling as the corresponding sample wells. They are extraction/process controls, not just downstream PCR controls.</p>
+<h2>OT-2 Pilot Run Settings</h2>
+<p>Use these environment variable settings for the OT-2 column of the pilot layout above. The values assume the OT-2 extraction wells occupy <code>A1-H1</code> of the 48-well plate and column 1 of the Norgen/Zymo workflow. Column 2 is unused as a spacer. The manual column (<code>A3-H3</code>) is processed manually.</p>
+<table><thead><tr><th>Step</th><th>Script</th><th>N_SAMPLES</th><th>WELL_START</th><th>FILTER_COL_START</th><th>TIP_START</th><th>P20_TIP_START</th><th>Notes</th></tr></thead><tbody><tr><td>1</td><td><code>1_add_slurry_lysis.py</code></td><td>8</td><td>0</td><td>0</td><td>0</td><td>N/A</td><td>Start a fresh p300 tip box; uses 2 p300 tips</td></tr><tr><td>3</td><td><code>3_etoh_centrifuge.py</code></td><td>8</td><td>0</td><td>0</td><td>2</td><td>N/A</td><td>Continue p300 box after Step 1; uses 11 p300 tips</td></tr><tr><td>4</td><td><code>4_transfer_to_filter.py</code></td><td>8</td><td>0</td><td>0</td><td>13</td><td>N/A</td><td>Continue p300 box after Step 3; uses 8 p300 tips</td></tr><tr><td>5</td><td><code>5_norgen_wash.py</code></td><td>8</td><td>ignored</td><td>0</td><td>21</td><td>N/A</td><td>Continue p300 box after Step 4; uses 3 p300 tips</td></tr><tr><td>5b</td><td><code>5b_norgen_elute.py</code></td><td>8</td><td>ignored</td><td>0</td><td>24</td><td>N/A</td><td>Continue p300 box after Step 5; uses 1 p300 tip</td></tr><tr><td>5c</td><td><code>5c_dnase_digestion.py</code></td><td>8</td><td>ignored</td><td>0</td><td>0</td><td>N/A</td><td>Start a fresh p20 tip box; uses 1 p20 tip</td></tr><tr><td>6</td><td><code>6_zymo_clean_conc.py</code></td><td>8</td><td>ignored</td><td>0</td><td>25</td><td>1</td><td>Continue p300 box after Step 5b and p20 box after Step 5c</td></tr></tbody></table>
+<p>Example commands:</p>
+<pre><code>N_SAMPLES=8 WELL_START=0 TIP_START=0 opentrons_execute 1_add_slurry_lysis.py
+N_SAMPLES=8 WELL_START=0 TIP_START=2 opentrons_execute 3_etoh_centrifuge.py
+N_SAMPLES=8 WELL_START=0 FILTER_COL_START=0 TIP_START=13 opentrons_execute 4_transfer_to_filter.py
+N_SAMPLES=8 FILTER_COL_START=0 TIP_START=21 opentrons_execute 5_norgen_wash.py
+N_SAMPLES=8 FILTER_COL_START=0 TIP_START=24 opentrons_execute 5b_norgen_elute.py
+N_SAMPLES=8 FILTER_COL_START=0 TIP_START=0 opentrons_execute 5c_dnase_digestion.py
+N_SAMPLES=8 FILTER_COL_START=0 TIP_START=25 P20_TIP_START=1 opentrons_execute 6_zymo_clean_conc.py</code></pre>
+<p>Manual extraction wells should be loaded into Norgen column 3 and processed manually through the corresponding Norgen, DNase and Zymo steps. Keep column 2 empty as a spacer. Confirm the manual column preserves the same well order across all plates.</p>
+<p>Use the same reagent lot, elution volume and downstream QC method for both extraction methods.</p>
+<h2>Workflow</h2>
+<ol>
+<li>Prepare the OT-2 using <code>OT2_SETUP.md</code>.</li>
+<li>Confirm labware offsets and run water/mock tests if calibration or labware has changed.</li>
+<li>Prepare matched aliquots from each source sample.</li>
+<li>Randomize aliquots into manual and OT-2 groups.</li>
+<li>Run manual and OT-2 extraction on unused wells of the same Norgen/Zymo plate workflow using the same reagent lot and same final elution volume.</li>
+<li>Record any pipetting, clogging, aspiration, transfer, centrifugation or elution issues.</li>
+<li>Run Bioanalyzer RNA 6000 Pico Kit for all final eluates in the same batch.</li>
+<li>If available, run qPCR on all samples in the same downstream batch.</li>
+</ol>
+<h2>Workflow Completion Checklist</h2>
+<p>Use this table during the run to track whether the manual column and OT-2 column have completed the same workflow stage. The step grouping follows the current script workflow without splitting every robot pause into a separate record.</p>
+<table><thead><tr><th>Workflow step</th><th>Manual completed</th><th>OT-2 completed</th><th>Notes</th></tr></thead><tbody><tr><td>Plate map, labels, aliquots and water controls confirmed</td><td>[ ]</td><td>[ ]</td><td></td></tr><tr><td>Step 1/2: slurry, lysis, sample/water loading and 60 °C incubation (<code>1_add_slurry_lysis.py</code> for OT-2)</td><td>[ ]</td><td>[ ]</td><td></td></tr><tr><td>Step 3A-B: EtOH added, mixed, centrifuged and slurry pelleted (<code>3_etoh_centrifuge.py</code>)</td><td>[ ]</td><td>[ ]</td><td></td></tr><tr><td>Step 3C-E: supernatant removed, re-lysis buffer added and EtOH wash added (<code>3_etoh_centrifuge.py</code>)</td><td>[ ]</td><td>[ ]</td><td></td></tr><tr><td>Step 4: sample/slurry transferred to Norgen filter plate and centrifuged (<code>4_transfer_to_filter.py</code>)</td><td>[ ]</td><td>[ ]</td><td></td></tr><tr><td>Step 5: Norgen wash steps completed (<code>5_norgen_wash.py</code>)</td><td>[ ]</td><td>[ ]</td><td></td></tr><tr><td>Step 5b: Norgen elution into 2 mL elution plate completed (<code>5b_norgen_elute.py</code>)</td><td>[ ]</td><td>[ ]</td><td></td></tr><tr><td>Step 5c: DNase master mix added and incubation completed (<code>5c_dnase_digestion.py</code>)</td><td>[ ]</td><td>[ ]</td><td></td></tr><tr><td>Step 6A-C: binding/RNA prep buffer, EtOH and Zymo loading completed (<code>6_zymo_clean_conc.py</code>)</td><td>[ ]</td><td>[ ]</td><td></td></tr><tr><td>Step 6D-F: Zymo washes, dry spin and final elution completed (<code>6_zymo_clean_conc.py</code>)</td><td>[ ]</td><td>[ ]</td><td></td></tr><tr><td>Final eluate volume and operational notes recorded</td><td>[ ]</td><td>[ ]</td><td></td></tr></tbody></table>
+<h2>Data to Record</h2>
+<p>For each replicate:</p>
+<table><thead><tr><th>Field</th><th>Notes</th></tr></thead><tbody><tr><td>Sample ID</td><td>Mimic-M1, Mimic-O1, Human-M1, Human-O1, etc.</td></tr><tr><td>Source sample</td><td>Fake cfRNA mimic or human blood/plasma</td></tr><tr><td>Method</td><td>Manual or OT-2</td></tr><tr><td>Input volume</td><td>Same across all replicates if possible</td></tr><tr><td>Elution volume</td><td>Same across all replicates</td></tr><tr><td>Final eluate volume observed</td><td>Record low-volume wells</td></tr><tr><td>RNA concentration</td><td>Bioanalyzer RNA 6000 Pico Kit</td></tr><tr><td>Bioanalyzer profile notes</td><td>Smear, peak pattern, degradation or abnormal trace</td></tr><tr><td>Operational notes</td><td>Clog, pellet disturbance, tip issue, low transfer, etc.</td></tr></tbody></table>
+<h2>Notes on Runtime</h2>
+<p>Because manual and OT-2 samples are processed on the same plate workflow, elapsed runtime is not a fair endpoint. The two methods will wait for each other.</p>
+<p>Record time descriptively:</p>
+<ul>
+<li>OT-2 robot active time.</li>
+<li>Manual active pipetting time.</li>
+<li>Total elapsed time.</li>
+<li>Waiting time caused by shared centrifuge, incubation or plate handling.</li>
+</ul>
+<p>For this pilot, use runtime notes only to identify bottlenecks. A true runtime comparison would require independent manual and OT-2 workflows with separate timing and no forced waiting between methods.</p></body></html>

@@ -42,7 +42,7 @@ except ImportError:
 # Pilot defaults; environment variables can still override these per run.
 N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
 FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
-TIP_START=int(os.environ.get('TIP_START','1'))    # fresh p20 rack in slot 6
+TIP_START=int(os.environ.get('TIP_START','0'))    # fresh p20 rack in slot 6
 WELL_START=int(os.environ.get('WELL_START','0'))  # unused by this column-wise script
 
 from opentrons import protocol_api
@@ -88,7 +88,7 @@ def run(protocol: protocol_api.ProtocolContext):
         for well in col:
             p20.aspirate(DNASE_VOL, dnase_src.bottom(1))
             p20.dispense(DNASE_VOL, well.bottom(5))
-            p20.blow_out(well.top(-5))
+            p20.blow_out(well.bottom(8))
     p20.drop_tip()
 
     protocol.comment(

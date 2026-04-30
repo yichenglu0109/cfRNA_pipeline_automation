@@ -42,8 +42,8 @@ except ImportError:
     ZYMO_FILTER='custom_zymo_96filterplate'    # simulation substitute
 
 # Pilot defaults; environment variables can still override these per run.
-N_SAMPLES=int(os.environ.get('N_SAMPLES','16'))
-TIP_START=int(os.environ.get('TIP_START','9'))    # 0=A1, 1=B1, ..., 8=A2
+N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
+TIP_START=int(os.environ.get('TIP_START','0'))    # fresh tip box; 0=A1, 1=B1, ..., 8=A2
 WELL_START=int(os.environ.get('WELL_START','0'))  # 0=A1, 1=B1, ..., 8=A2
 
 from opentrons import protocol_api
@@ -53,7 +53,6 @@ metadata = {
     'author': 'Peter Lu, adapted from Moufarrej & Quake (2023) Nature Protocols',
     'apiLevel': '2.13',
 }
-
 
 def run(protocol: protocol_api.ProtocolContext):
 

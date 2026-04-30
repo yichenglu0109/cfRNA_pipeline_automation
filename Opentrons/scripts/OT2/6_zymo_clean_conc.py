@@ -33,7 +33,7 @@ except ImportError:
     STOP_COL=int(os.environ.get('STOP_COL','6'))
     FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
     N_SAMPLES=int(os.environ.get('N_SAMPLES','4'))
-    TIP_START=int(os.environ.get('TIP_START','17'))    # 0=A1, 1=B1, ..., 8=A2
+    TIP_START=int(os.environ.get('TIP_START','25'))    # after Step 5b uses 1 more p300 tip
     WELL_START=int(os.environ.get('WELL_START','6'))  # well index on sample/filter plate
     TIPS_200='opentrons_96_filtertiprack_200ul'
     TIPS_300='opentrons_96_tiprack_300ul'
@@ -49,8 +49,8 @@ except ImportError:
 # Pilot defaults; environment variables can still override these per run.
 N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
 FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
-TIP_START=int(os.environ.get('TIP_START','34'))       # p300 rack continues after Step 5
-P20_TIP_START=int(os.environ.get('P20_TIP_START','1')) # p20 rack continues after Step 5b uses A1
+TIP_START=int(os.environ.get('TIP_START','25'))       # after Steps 1-5b use 25 p300 tips
+P20_TIP_START=int(os.environ.get('P20_TIP_START','1')) # after Step 5c uses 1 p20 tip
 WELL_START=int(os.environ.get('WELL_START','0'))       # unused by this column-wise script
 
 from opentrons import protocol_api
@@ -158,7 +158,7 @@ def run(protocol: protocol_api.ProtocolContext):
         for src_well, dst_well in zip(src_col, dst_col):
             p300.pick_up_tip()
             for _ in range(ZYMO_LOAD_REPS):   # 3 × 226 µL = 678 µL
-                p300.aspirate(ZYMO_LOAD_VOL, src_well.bottom(0.5))
+                p300.aspirate(ZYMO_LOAD_VOL, src_well.bottom(0.3))
                 protocol.delay(seconds=0.5)
                 p300.air_gap(20)
                 p300.dispense(ZYMO_LOAD_VOL + 20, dst_well.top(-5))
@@ -242,7 +242,7 @@ def run(protocol: protocol_api.ProtocolContext):
     )
 
     # ════════════════════════════════════════════════════════════════════
-    # 7. Elution  (12.5 µL nuclease-free H2O per well; p20)
+    # 7. Elution  (15 µL nuclease-free H2O per well; p20)
     # ════════════════════════════════════════════════════════════════════
     protocol.pause(
         "STEP 6G  ▶  Discard collection plate. Place filter plate on a NEW "
@@ -255,13 +255,13 @@ def run(protocol: protocol_api.ProtocolContext):
     p20.pick_up_tip()
     for col in target_filter_cols:
         for well in col:
-            p20.aspirate(12.5, elu_src.bottom(1))
-            p20.dispense(12.5, well.bottom(5))
-            p20.blow_out(well.top(-2))
+            p20.aspirate(15, elu_src.bottom(1))
+            p20.dispense(15, well.bottom(5))
+            p20.blow_out(well.bottom(6))
     p20.drop_tip()
 
     protocol.comment(
         "Step 6 complete. "
         "Centrifuge filter + elution plate 5 min at 3,000–5,000 g. "
-        "Confirm ~12 µL eluate per well. Aliquot and freeze at -80 °C."
+        "Confirm ~15 µL eluate per well. Aliquot and freeze at -80 °C."
     )

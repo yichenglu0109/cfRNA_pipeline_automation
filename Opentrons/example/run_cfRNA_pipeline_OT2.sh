@@ -170,7 +170,7 @@ if [[ "$if_zymo" =~ ^[Yy]$ ]]; then
         "START_COL=0 STOP_COL=${ZYMO_STOP}"
 
     echo "" | tee -a "$LOG_FILE"
-    echo "MANUAL FINAL STEP: add 12.5 µL nuclease-free H2O per well." | tee -a "$LOG_FILE"
+    echo "MANUAL FINAL STEP: add 15 µL nuclease-free H2O per well." | tee -a "$LOG_FILE"
     echo "Centrifuge 5 min at 3,000–5,000 g. Aliquot 4 µL into labelled plates. Freeze at -80°C." | tee -a "$LOG_FILE"
 fi
 

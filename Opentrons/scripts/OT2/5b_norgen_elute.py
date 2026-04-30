@@ -28,7 +28,7 @@ except ImportError:
     STOP_COL=int(os.environ.get('STOP_COL','6'))
     FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
     N_SAMPLES=int(os.environ.get('N_SAMPLES','2'))
-    TIP_START=int(os.environ.get('TIP_START','3'))    # after Step 5 wash uses A1-C1
+    TIP_START=int(os.environ.get('TIP_START','24'))    # after Step 5 uses 3 more p300 tips
     WELL_START=int(os.environ.get('WELL_START','0'))  # well index on filter plate
     TIPS_200='opentrons_96_filtertiprack_200ul'
     TIPS_300='opentrons_96_tiprack_300ul'
@@ -45,7 +45,7 @@ except ImportError:
 # Pilot defaults; environment variables can still override these per run.
 N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
 FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
-TIP_START=int(os.environ.get('TIP_START','33'))   # after Step 5 wash uses A1-C1
+TIP_START=int(os.environ.get('TIP_START','24'))   # after Step 5 uses 3 more p300 tips
 WELL_START=int(os.environ.get('WELL_START','0'))  # unused by this column-wise script
 
 from opentrons import protocol_api

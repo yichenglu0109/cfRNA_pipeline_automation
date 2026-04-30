@@ -30,7 +30,7 @@ except ImportError:
     STOP_COL=int(os.environ.get('STOP_COL','6'))
     FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
     N_SAMPLES=int(os.environ.get('N_SAMPLES','4'))
-    TIP_START=int(os.environ.get('TIP_START','25'))    # 0=A1, 1=B1, ..., 8=A2
+    TIP_START=int(os.environ.get('TIP_START','2'))    # after Step 1 uses 2 p300 tips
     WELL_START=int(os.environ.get('WELL_START','0'))  # 0=A1, 1=B1, ..., 8=A2
     TIPS_200='opentrons_96_filtertiprack_200ul'
     TIPS_300='opentrons_96_tiprack_300ul'
@@ -45,7 +45,7 @@ except ImportError:
 
 # Pilot defaults; environment variables can still override these per run.
 N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
-TIP_START=int(os.environ.get('TIP_START','11'))    # continues after Step 1 uses A1-B1
+TIP_START=int(os.environ.get('TIP_START','2'))    # after Step 1 uses 2 p300 tips
 WELL_START=int(os.environ.get('WELL_START','0'))  # 0=A1, 1=B1, ..., 8=A2
 
 from opentrons import protocol_api
@@ -57,8 +57,8 @@ metadata = {
 }
 
 # Well cross-section 16×8=128 mm²; post-EtOH liquid ~39 mm.
-# Heights cover 37→3 mm; 12 levels × 2 reps × 250 µL = 6000 µL capacity.
-DECANT_HEIGHTS = [37, 34, 30, 26, 22, 18, 14, 10, 8, 6, 4, 3]
+# Heights cover 37→4 mm; 12 levels × 2 reps × 250 µL = 6000 µL capacity.
+DECANT_HEIGHTS = [37, 34, 30, 26, 22, 18, 14, 10, 8, 6, 5, 4]
 DECANT_VOL     = 250   # µL per aspirate step (p300)
 DECANT_REPS    = 2     # reps per height
 

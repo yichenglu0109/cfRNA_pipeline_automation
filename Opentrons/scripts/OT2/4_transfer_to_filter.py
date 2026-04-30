@@ -44,7 +44,7 @@ except ImportError:
 # Pilot defaults; environment variables can still override these per run.
 N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
 FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
-TIP_START=int(os.environ.get('TIP_START','22'))    # fresh p300 rack in slot 8
+TIP_START=int(os.environ.get('TIP_START','13'))   # after Steps 1 and 3 use 13 p300 tips
 WELL_START=int(os.environ.get('WELL_START','0'))  # 0=A1, 1=B1, ..., 8=A2
 
 from opentrons import protocol_api
