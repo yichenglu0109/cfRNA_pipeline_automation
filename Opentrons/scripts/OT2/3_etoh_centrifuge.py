@@ -7,9 +7,9 @@ Tips  : p300 ×99 total (1 EtOH + 48 mix + 48 decant + 1 relysis + 1 wash)
 
 Deck layout
 -----------
-Slot 1 : nest_1_reservoir_195ml       – EtOH (150 mL 200-proof EtOH)
+Slot 1 : dynamic reagent source        – EtOH
 Slot 2 : custom_48_wellplate_7000ul   – 48-well sample plate
-Slot 3 : nest_1_reservoir_195ml       – re-lysis buffer (20 mL); re-used for EtOH wash
+Slot 3 : dynamic reagent source        – re-lysis buffer; re-used for EtOH wash
 Slot 5 : custom_48_wellplate_7000ul   – liquid trash (open container, e.g. empty tip box)
 Slot 8 : opentrons_96_tiprack_300ul
 Slot 9 : opentrons_96_tiprack_300ul
@@ -37,6 +37,7 @@ except ImportError:
     TIPS_1000='opentrons_96_filtertiprack_1000ul'
     RESERVOIR_1='nest_1_reservoir_195ml'
     RESERVOIR_12='nest_12_reservoir_15ml'
+    TUBE_BLOCK_2ML='opentrons_24_aluminumblock_nest_2ml_snapcap'
     WELLPLATE_2ML='nest_96_wellplate_2ml_deep'
     PCR_PLATE='nest_96_wellplate_100ul_pcr_full_skirt'
     PLATE_48='custom_48_wellplate_7000ul'       # simulation substitute
@@ -47,6 +48,7 @@ except ImportError:
 N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
 TIP_START=int(os.environ.get('TIP_START','2'))    # after Step 1 uses 2 p300 tips
 WELL_START=int(os.environ.get('WELL_START','0'))  # 0=A1, 1=B1, ..., 8=A2
+TUBE_BLOCK_2ML = globals().get('TUBE_BLOCK_2ML', 'opentrons_24_aluminumblock_nest_2ml_snapcap')
 
 from opentrons import protocol_api
 
@@ -61,24 +63,85 @@ metadata = {
 DECANT_HEIGHTS = [37, 34, 30, 26, 22, 18, 14, 10, 8, 6, 5, 4]
 DECANT_VOL     = 250   # µL per aspirate step (p300)
 DECANT_REPS    = 2     # reps per height
+RELYSIS_VOL    = 300
+WASH_VOL       = 300
+SMALL_SOURCE_MAX_UL = 4000
+SINGLE_TUBE_MAX_UL = 2000
+REAGENT_EXCESS = 1.2
+
+
+class ReagentSource:
+    def __init__(self, wells, volumes_ul):
+        self.wells = wells
+        self.remaining = list(volumes_ul)
+        self.index = 0
+
+    def aspiration_location(self, volume_ul):
+        while len(self.wells) > 1 and self.index < len(self.wells) - 1 and self.remaining[self.index] <= 0:
+            self.index += 1
+        if len(self.wells) > 1 and self.remaining[self.index] < volume_ul and self.index < len(self.wells) - 1:
+            self.index += 1
+        self.remaining[self.index] -= volume_ul
+        return self.wells[self.index].bottom(1.5)
+
+
+def format_ul(ul):
+    return f"{ul / 1000:.1f} mL ({ul:.0f} µL)" if ul >= 1000 else f"{ul:.0f} µL"
+
+
+def source_layout(total_ul):
+    if total_ul < SMALL_SOURCE_MAX_UL:
+        n_sources = 1 if total_ul <= SINGLE_TUBE_MAX_UL else 2
+        return True, n_sources, total_ul / n_sources
+    return False, 1, total_ul
+
+
+def load_source(protocol, slot, total_ul):
+    use_tubes, _, _ = source_layout(total_ul)
+    return protocol.load_labware(TUBE_BLOCK_2ML if use_tubes else RESERVOIR_1, slot)
+
+
+def make_source(labware, total_ul):
+    use_tubes, n_sources, per_source = source_layout(total_ul)
+    if use_tubes:
+        wells = [labware.wells_by_name()[name] for name in ['A1', 'A2'][:n_sources]]
+        return ReagentSource(wells, [per_source] * n_sources)
+    return ReagentSource([labware.wells()[0]], [total_ul])
+
+
+def source_prompt(slot, total_ul, label):
+    use_tubes, n_sources, per_source = source_layout(total_ul)
+    if use_tubes:
+        details = ", ".join(f"{name}: {format_ul(per_source)}" for name in ['A1', 'A2'][:n_sources])
+        return (
+            f"Place a 24-well aluminum block with LoBind tube(s) at SLOT {slot}. "
+            f"Add {label} to {details}."
+        )
+    return (
+        f"Place a 195 mL single-channel reservoir at SLOT {slot}. "
+        f"Add {format_ul(total_ul)} {label}."
+    )
 
 
 def run(protocol: protocol_api.ProtocolContext):
+    etoh_total_ul = N_SAMPLES * ETOH_VOL * REAGENT_EXCESS
+    relysis_total_ul = N_SAMPLES * RELYSIS_VOL * REAGENT_EXCESS
+    wash_total_ul = N_SAMPLES * WASH_VOL * REAGENT_EXCESS
+    slot3_load_ul = max(relysis_total_ul, wash_total_ul)
 
     # ── Labware ───────────────────────────────────────────────────────────
     tips_a     = protocol.load_labware(TIPS_300, 9)
     tips_b     = protocol.load_labware(TIPS_300, 8)
     plate      = protocol.load_labware(PLATE_48,  2)
-    etoh_res   = protocol.load_labware(RESERVOIR_1, 1)
-    lysis_res  = protocol.load_labware(RESERVOIR_1, 3)
+    etoh_res   = load_source(protocol, 1, etoh_total_ul)
+    lysis_res  = load_source(protocol, 3, slot3_load_ul)
     liq_trash  = protocol.load_labware(PLATE_48,   5)
 
     # ── Pipettes ──────────────────────────────────────────────────────────
     p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips_a, tips_b])
     p300.starting_tip = tips_a.wells()[TIP_START]
 
-    etoh_src  = etoh_res.wells()[0]
-    lysis_src = lysis_res.wells()[0]
+    etoh_src  = make_source(etoh_res, etoh_total_ul)
 
     target_wells = plate.wells()[WELL_START:WELL_START + N_SAMPLES]
 
@@ -87,7 +150,7 @@ def run(protocol: protocol_api.ProtocolContext):
     # ════════════════════════════════════════════════════════════════════
     protocol.pause(
         "STEP 3A  ▶  Place sealed 48-well plate at SLOT 2. "
-        "Add 150 mL 200-proof EtOH to reservoir at SLOT 1. "
+        f"{source_prompt(1, etoh_total_ul, '200-proof EtOH')} "
         "Load 2 full p300 tip racks at SLOTS 8 and 9. "
         "Remove seal from plate. Resume when ready."
     )
@@ -98,7 +161,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.pick_up_tip()
     for well in target_wells:
         for _ in range(etoh_iters):
-            p300.aspirate(etoh_per_disp, etoh_src.bottom(2))
+            p300.aspirate(etoh_per_disp, etoh_src.aspiration_location(etoh_per_disp))
             p300.air_gap(10)
             p300.dispense(etoh_per_disp, well.top(-5))
             p300.blow_out(well.top(-5))
@@ -137,14 +200,15 @@ def run(protocol: protocol_api.ProtocolContext):
     # ════════════════════════════════════════════════════════════════════
     protocol.pause(
         "STEP 3D  ▶  Remove liquid-waste container from SLOT 5. "
-        "Add 20 mL preheated lysis buffer to reservoir at SLOT 3. "
+        f"{source_prompt(3, relysis_total_ul, 'preheated lysis buffer')} "
         "Move plate to SLOT 2. Resume."
     )
 
+    lysis_src = make_source(lysis_res, relysis_total_ul)
     p300.pick_up_tip()
     for well in target_wells:
-        p300.aspirate(300, lysis_src.bottom(2))
-        p300.dispense(300, well.top(-20))
+        p300.aspirate(RELYSIS_VOL, lysis_src.aspiration_location(RELYSIS_VOL))
+        p300.dispense(RELYSIS_VOL, well.top(-20))
         p300.blow_out(well.top(-20))
     p300.drop_tip()
 
@@ -160,14 +224,16 @@ def run(protocol: protocol_api.ProtocolContext):
     # PHASE 3 – Add EtOH wash (300 µL/well; 1 tip reused)
     # ════════════════════════════════════════════════════════════════════
     protocol.pause(
-        "STEP 3F  ▶  Empty SLOT 3 reservoir and add 20 mL 200-proof EtOH. "
+        "STEP 3F  ▶  Empty the SLOT 3 reagent source. "
+        f"{source_prompt(3, wash_total_ul, '200-proof EtOH')} "
         "Remove seal from plate and return to SLOT 2. Resume."
     )
 
+    wash_src = make_source(lysis_res, wash_total_ul)
     p300.pick_up_tip()
     for well in target_wells:
-        p300.aspirate(300, lysis_src.bottom(2))
-        p300.dispense(300, well.top(-20))
+        p300.aspirate(WASH_VOL, wash_src.aspiration_location(WASH_VOL))
+        p300.dispense(WASH_VOL, well.top(-20))
         p300.blow_out(well.top(-20))
     p300.drop_tip()
 

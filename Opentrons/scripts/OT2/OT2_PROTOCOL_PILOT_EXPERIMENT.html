@@ -16,7 +16,7 @@ pre { background: #f4f4f4; padding: 5pt; overflow-wrap: break-word; white-space:
 strong { font-weight: 800; }
 </style></head><body><h1>Pilot Experiment: Manual vs Semi-Automated OT-2 cfRNA Extraction</h1>
 <p>Author: Peter Lu</p>
-<p>Date: 2026-04-29</p>
+<p>Date: 2026-05-02</p>
 <p>This pilot experiment compares the current semi-automated OT-2 cfRNA extraction workflow against manual extraction using matched aliquots from the same source samples. To conserve kit plates, the pilot is designed as a same-plate performance comparison using the same Norgen and Zymo plate workflow. The goal is to evaluate extraction performance and reproducibility, not total protocol runtime.</p>
 <h2>Objective</h2>
 <p>Evaluate whether the current OT-2 protocol produces cfRNA yield and quality comparable to manual extraction when starting from the same input material.</p>
@@ -91,6 +91,7 @@ N_SAMPLES=8 FILTER_COL_START=0 TIP_START=21 opentrons_execute 5_norgen_wash.py
 N_SAMPLES=8 FILTER_COL_START=0 TIP_START=24 opentrons_execute 5b_norgen_elute.py
 N_SAMPLES=8 FILTER_COL_START=0 TIP_START=0 opentrons_execute 5c_dnase_digestion.py
 N_SAMPLES=8 FILTER_COL_START=0 TIP_START=25 P20_TIP_START=1 opentrons_execute 6_zymo_clean_conc.py</code></pre>
+<p>For <code>N_SAMPLES=8</code>, Step 5c will prompt for <strong>114 µL DNase master mix</strong> in LoBind tube A1 of a 24-well aluminum block at slot 4. Step 6 uses the prompted slot 4 dynamic reagent source for small-volume reagents; Wash 1 still uses the slot 1 reservoir.</p>
 <p>Manual extraction wells should be loaded into Norgen column 3 and processed manually through the corresponding Norgen, DNase and Zymo steps. Keep column 2 empty as a spacer. Confirm the manual column preserves the same well order across all plates.</p>
 <p>Use the same reagent lot, elution volume and downstream QC method for both extraction methods.</p>
 <h2>Workflow</h2>

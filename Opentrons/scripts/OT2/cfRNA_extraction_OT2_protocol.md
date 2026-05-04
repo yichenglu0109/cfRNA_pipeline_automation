@@ -1,7 +1,7 @@
 # Semi-Automated cfRNA Extraction on OT-2
 
 Author: Peter Lu  
-Date: 2026-04-29
+Date: 2026-05-02
 
 The operating protocol for the OT-2 scripts in this directory. It is intended to be used by an operator standing at the robot. The OT-2 performs repetitive liquid handling; the user adds reagents, moves plates, centrifuges plates, seals/unseals plates, vortexes samples and verifies setup at each pause.
 
@@ -99,6 +99,7 @@ Custom labware must be installed on the OT-2:
 Standard labware used by scripts:
 
 - `nest_1_reservoir_195ml`
+- `opentrons_24_aluminumblock_nest_2ml_snapcap`, for small-volume reagent sources in Step 5c and Step 6
 - `thermoscientificnunc_96_wellplate_2000ul`
 - `opentrons_96_tiprack_300ul`
 - `opentrons_96_tiprack_20ul`, only for p20 scripts
@@ -360,13 +361,13 @@ Current deck layout for robot p20 mode:
 | Slot | Labware | Contents |
 |---|---|---|
 | 2 | `thermoscientificnunc_96_wellplate_2000ul` | Norgen elution plate |
-| 4 | `nest_1_reservoir_195ml` | DNase master mix |
+| 4 | dynamic source: `opentrons_24_aluminumblock_nest_2ml_snapcap` with LoBind tube(s), or `nest_1_reservoir_195ml` | DNase master mix |
 | 6 | `opentrons_96_tiprack_20ul` | p20 tips |
 
 62. Prepare DNase master mix on ice. Each sample requires **11 uL 10x DNase buffer and 2 uL DNase**. Include **10% excess**.
-63. If using robot p20 mode, add master mix to the single-channel reservoir at slot 4.
+63. If using robot p20 mode, add master mix to the slot 4 source prompted by `5c_dnase_digestion.py`: LoBind tube A1/A2 in a 24-well aluminum block for small volumes, or a 195 mL reservoir for large volumes. For `N_SAMPLES=8`, prepare **114 uL** total and place it in LoBind tube A1.
 64. Place the Norgen elution plate at slot 2.
-65. Resume `5c_dnase_digestion.py`. The robot adds **13 uL master mix per well** at `bottom(5)` and performs a blowout at `bottom(6)` in the same well.
+65. Resume `5c_dnase_digestion.py`. The robot adds **13 uL master mix per well** at `bottom(5)` and performs a blowout at `bottom(8)` in the same well.
     **Recommend using manual P20 for this step.**
 66. If using manual mode, add **13 uL DNase master mix** to each sample well with a P20 multichannel pipette.
 67. **Seal the plate and vortex lightly**.
@@ -393,19 +394,19 @@ Current deck layout:
 
 | Slot | Labware | Contents |
 |---|---|---|
-| 1 | `nest_1_reservoir_195ml` | replace between RNA prep buffer, wash buffer and nuclease-free water |
+| 1 | `nest_1_reservoir_195ml` | wash buffer round 1 |
 | 2 | `custom_zymo_96filterplate` | Zymo filter plate on collection/elution plate |
 | 3 | `thermoscientificnunc_96_wellplate_2000ul` | post-DNase sample plate |
-| 4 | `nest_1_reservoir_195ml` | replace between binding buffer and EtOH |
+| 4 | dynamic source: `opentrons_24_aluminumblock_nest_2ml_snapcap` with LoBind tube(s), or `nest_1_reservoir_195ml` | binding buffer, EtOH, RNA prep buffer, wash 2 and nuclease-free water |
 | 6 | `opentrons_96_tiprack_20ul` | p20 tips |
 | 8 | `opentrons_96_tiprack_300ul` | p300 tips |
 | 9 | `opentrons_96_tiprack_300ul` | p300 tips |
 
 69. Place the post-DNase sample plate at slot 3.
-70. Place a 195 mL single-channel reservoir containing the **binding buffer volume prompted by `6_zymo_clean_conc.py`** at slot 4. For one 8-well column, this is about **2.2 mL including excess**.
+70. Place the slot 4 reagent source prompted by `6_zymo_clean_conc.py` containing binding buffer. For one 8-well column, this is about **2.2 mL including excess** and will usually use LoBind tube(s) in a 24-well aluminum block.
 71. Load p300 tip racks at slots 8 and 9.
 72. Press Resume in the Opentrons App. The robot adds **226 uL binding buffer per well** and performs a high blowout in each well.
-73. Replace the slot 4 reservoir with a 195 mL single-channel reservoir containing the **100% EtOH volume prompted by `6_zymo_clean_conc.py`**. For one 8-well column, this is about **3.3 mL including excess**.
+73. Empty or replace the slot 4 reagent source and add the **100% EtOH volume prompted by `6_zymo_clean_conc.py`**. For one 8-well column, this is about **3.3 mL including excess** and will usually use LoBind tube(s).
 74. Press Resume in the Opentrons App. The robot adds **339 uL EtOH per well** and performs a high blowout in each well.
 75. Remove the sample plate from slot 3.
 76. **Seal and vortex at least 30 s**.
@@ -420,20 +421,20 @@ volume.
 
 80. Centrifuge the Zymo filter plate for **5 min at 3,000-5,000g** at room temperature.
 81. Discard flow-through and reassemble the filter plate with the collection plate.
-82. Place a 195 mL single-channel reservoir containing the **RNA prep buffer volume prompted by `6_zymo_clean_conc.py`** at slot 1. For one 8-well column, this is about **3.8 mL including excess**.
+82. Empty or replace the slot 4 reagent source and add the **RNA prep buffer volume prompted by `6_zymo_clean_conc.py`**. For one 8-well column, this is about **3.8 mL including excess**.
 83. Place the filter plate at slot 2 and press Resume in the Opentrons App. The robot adds **400 uL RNA prep buffer per well** and performs a high blowout in each well.
 84. Centrifuge **5 min at 3,000-5,000g**.
 85. Discard flow-through and reassemble the plate.
-86. Replace the slot 1 reservoir with a 195 mL single-channel reservoir containing the **wash buffer volume prompted by `6_zymo_clean_conc.py`**. For one 8-well column, this is about **6.7 mL including excess**.
+86. Replace the slot 1 reservoir with a 195 mL single-channel reservoir containing the **wash buffer round 1 volume prompted by `6_zymo_clean_conc.py`**. For one 8-well column, this is about **6.7 mL including excess**.
 87. Press Resume in the Opentrons App. The robot adds **700 uL wash buffer per well** and performs a high blowout in each well.
 88. Centrifuge **5 min at 3,000-5,000g**.
 89. Discard flow-through and replace the collection plate with a new one.
-90. Replace the slot 1 reservoir with a 195 mL single-channel reservoir containing the **wash buffer volume prompted by `6_zymo_clean_conc.py`**. For one 8-well column, this is about **3.8 mL including excess**.
+90. Empty or replace the slot 4 reagent source and add the **wash buffer round 2 volume prompted by `6_zymo_clean_conc.py`**. For one 8-well column, this is about **3.8 mL including excess**.
 91. Press Resume in the Opentrons App. The robot adds **400 uL wash buffer per well** and performs a high blowout in each well.
 92. Centrifuge **5 min at 3,000-5,000g**.
 93. Discard flow-through and dispose of the collection plate.
 94. **Place the Zymo filter plate on a new final elution plate. Align A1 over A1.**
-95. Replace the slot 1 reservoir with a 195 mL single-channel reservoir containing **1 mL nuclease-free water**.
+95. Empty or replace the slot 4 reagent source and add the nuclease-free water volume prompted by `6_zymo_clean_conc.py`. For the current script, this is **1 mL** and will usually use LoBind tube A1.
 96. If using robot p20 mode, press Resume in the Opentrons App. The robot adds **15 uL water per well** and performs a high blowout in each well.
     **Recommend using manual P20 for this step.**
 97. If using manual mode, add **15 uL nuclease-free water** to each sample well with a P20 multichannel pipette. Wet the filter membrane and avoid splashing the side walls.

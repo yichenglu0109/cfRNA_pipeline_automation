@@ -1,0 +1,339 @@
+<!doctype html><html><head><meta charset="utf-8"><title>cfRNA OT2 Protocol</title><style>
+@page { margin: 0.45in; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-size: 9.4pt; line-height: 1.22; color: #111; }
+h1 { font-size: 18pt; margin: 0 0 8pt; }
+h2 { font-size: 12.8pt; margin: 10pt 0 4pt; border-bottom: 1px solid #ddd; padding-bottom: 2pt; }
+h3 { font-size: 10.8pt; margin: 8pt 0 3pt; }
+h4 { font-size: 9.8pt; margin: 6pt 0 2pt; }
+p { margin: 0 0 4pt; }
+ul, ol { margin: 0 0 5pt 17pt; padding: 0; }
+li { margin: 1pt 0; }
+table { border-collapse: collapse; width: 100%; margin: 5pt 0 6pt; page-break-inside: auto; }
+th, td { border: 1px solid #bbb; padding: 2.5pt 3pt; vertical-align: top; }
+th { background: #eee; font-weight: 700; }
+code { font-family: Menlo, Consolas, monospace; font-size: 8.2pt; background: #f4f4f4; padding: 0 1pt; }
+pre { background: #f4f4f4; padding: 5pt; overflow-wrap: break-word; white-space: pre-wrap; }
+strong { font-weight: 800; }
+</style></head><body><h1>Semi-Automated cfRNA Extraction on OT-2</h1>
+<p>Author: Peter Lu</p>
+<p>Date: 2026-05-02</p>
+<p>The operating protocol for the OT-2 scripts in this directory. It is intended to be used by an operator standing at the robot. The OT-2 performs repetitive liquid handling; the user adds reagents, moves plates, centrifuges plates, seals/unseals plates, vortexes samples and verifies setup at each pause.</p>
+<h2>Overview</h2>
+<p>The cfRNA workflow is divided into three stages:</p>
+<ol>
+<li>RNA extraction from 48-well deep-well plates.</li>
+<li>DNase digestion of the Norgen eluate.</li>
+<li>RNA cleanup and concentration using a Zymo filter plate.</li>
+</ol>
+<p>For a 96-sample experiment, process two 48-sample batches through Norgen</p>
+<p>extraction. The first 48-sample eluate can be sealed and refrigerated while the</p>
+<p>second 48-sample batch is processed. After both batches are eluted into the</p>
+<p>96-well plate, proceed with DNase digestion and Zymo cleanup.</p>
+<p>Current production scripts and timing:</p>
+<table><thead><tr><th>Stage</th><th>Section</th><th>Current script or operation</th><th>Purpose</th><th>Current total time</th><th>If refactored to p300 multichannel</th></tr></thead><tbody><tr><td>RNA extraction</td><td>Step 1</td><td><code>1_add_slurry_lysis.py</code></td><td>Add slurry and lysis buffer</td><td>about 35 min</td><td>about 25-40 min</td></tr><tr><td>RNA extraction</td><td>Step 2</td><td>manual</td><td>Add sample, mix, incubate</td><td>15-25 min</td><td>unchanged</td></tr><tr><td>RNA extraction</td><td>Step 3</td><td><code>3_etoh_centrifuge.py</code></td><td>Add EtOH, vortex, pellet, decant, re-lysis, EtOH wash</td><td>about 8 h</td><td>about 1-1.5 h if multi-channel decant is validated</td></tr><tr><td>RNA extraction</td><td>Step 4</td><td><code>4_transfer_to_filter.py</code></td><td>Transfer sample to Norgen filter plate</td><td>about 1 h</td><td>about 15-25 min</td></tr><tr><td>RNA extraction</td><td>Step 5/5b</td><td><code>5_norgen_wash.py</code> + <code>5b_norgen_elute.py</code></td><td>Wash Norgen filter, then swap to 2 mL deep-well receiver and elute cfRNA</td><td>about 1.5 h</td><td>about 30-45 min</td></tr><tr><td>DNA digestion</td><td>Step 5c</td><td><code>5c_dnase_digestion.py</code> or manual P20</td><td>Add DNase master mix and incubate</td><td>about 1 h</td><td>p300 multichannel not applicable; use p20/manual P20 multichannel</td></tr><tr><td>Cleanup</td><td>Step 6</td><td><code>6_zymo_clean_conc.py</code></td><td>Zymo bind, wash and elute</td><td>about 1 h</td><td>about 1-1.5 h; final elution still p20/manual</td></tr><tr><td>Summary</td><td>RNA extraction, one 48-sample batch</td><td>Steps 1-5</td><td>Norgen extraction through first elution</td><td>about 11-11.5 h</td><td>about 2.5-4 h</td></tr><tr><td>Summary</td><td>RNA extraction, two 48-sample batches</td><td>Steps 1-5 twice</td><td>Two 48-well batches into one 96-well layout</td><td>about 22-23 h</td><td>about 5-8 h</td></tr><tr><td>Summary</td><td>Full 96-sample OT-2 run</td><td>Steps 1-6</td><td>Extraction, DNase and Zymo cleanup</td><td>about 24-25 h</td><td>about 6.5-10 h</td></tr></tbody></table>
+<h2>Timing</h2>
+<p>The table above summarizes the current timing recorded in the scripts and the</p>
+<p>expected total time for each operating section. The p300 multichannel column is</p>
+<p>a rewrite estimate and has not been validated on the current scripts. Sample</p>
+<p>and reagent preparation is not included and typically adds 10-20 min.</p>
+<p>The current scripts are not yet optimized for the available `p1000_single +</p>
+<p>p300_multi` hardware. Robot time can be reduced substantially by refactoring</p>
+<p>high-volume operations to p1000 single and column operations to p300 multi.</p>
+<p>The Nature Protocols timing of about 4.5 h for 96 samples should be treated as</p>
+<p>an optimized semi-automated target, not as the expected runtime of the current</p>
+<p>single-channel OT-2 scripts.</p>
+<h2>Experimental Design</h2>
+<p>The current scripts assume 48-well extraction followed by 96-well filter plate</p>
+<p>cleanup. A full 96-sample run is handled as two 48-sample batches:</p>
+<ul>
+<li>Batch 1 fills Norgen/Zymo/filter columns 1-6 (<code>FILTER_COL_START=0</code>).</li>
+<li>Batch 2 fills columns 7-12 (<code>FILTER_COL_START=6</code>).</li>
+</ul>
+<p>For multi-channel use, samples must be arranged in complete columns of eight</p>
+<p>wells. If fewer than eight samples are present in the final column, either add</p>
+<p>blank wells, handle the partial column manually, or use a single-channel</p>
+<p>script.</p>
+<h2>Hardware Configuration</h2>
+<h3>Current script assumptions</h3>
+<p>Most current scripts use:</p>
+<ul>
+<li><code>p300_single_gen2</code> on the left mount</li>
+<li><code>p20_single_gen2</code> on the right mount for DNase and final 15 uL elution</li>
+</ul>
+<h3>Available hardware configuration</h3>
+<p>If the robot only has:</p>
+<ul>
+<li><code>p1000_single_gen2</code></li>
+<li><code>p300_multi_gen2</code></li>
+</ul>
+<p>then the current scripts should be refactored before production. Recommended</p>
+<p>division of labor:</p>
+<ul>
+<li>p1000 single: 1.8 mL lysis, 3 mL EtOH, high-volume 48-well additions and conservative decant/removal.</li>
+<li>p300 multi: full-column additions and transfers in 48-well, Norgen and Zymo filter plates.</li>
+<li>Manual P20 multichannel: DNase 13 uL/well and final 15 uL/well nuclease-free water addition.</li>
+</ul>
+<p><strong>Critical step:</strong> do not run a script with a pipette configuration that does not</p>
+<p>match the script. The robot will not automatically translate p300-single logic</p>
+<p>to p300-multi or p1000-single logic.</p>
+<h2>Required Labware</h2>
+<p>Custom labware must be installed on the OT-2:</p>
+<ul>
+<li><code>custom_48_wellplate_7000ul</code></li>
+<li><code>custom_norgen_96filterplate</code></li>
+<li><code>custom_zymo_96filterplate</code> with the current 60 mm stack height definition</li>
+</ul>
+<p>Standard labware used by scripts:</p>
+<ul>
+<li><code>nest_1_reservoir_195ml</code></li>
+<li><code>opentrons_24_aluminumblock_nest_2ml_snapcap</code>, for small-volume reagent sources in Step 5c and Step 6</li>
+<li><code>thermoscientificnunc_96_wellplate_2000ul</code></li>
+<li><code>opentrons_96_tiprack_300ul</code></li>
+<li><code>opentrons_96_tiprack_20ul</code>, only for p20 scripts</li>
+</ul>
+<h2>Reagent Setup</h2>
+<p>Prepare reagents according to the extraction kit instructions and sample input</p>
+<p>volume. The current scripts use the following defaults:</p>
+<table><thead><tr><th>Reagent</th><th>Current amount used in script</th></tr></thead><tbody><tr><td>Slurry</td><td><strong>200 uL/well</strong></td></tr><tr><td>Lysis buffer</td><td><strong>1800 uL/well</strong></td></tr><tr><td>EtOH for extraction</td><td><strong>3000 uL/well</strong></td></tr><tr><td>Re-lysis buffer</td><td><strong>300 uL/well</strong></td></tr><tr><td>EtOH wash after re-lysis</td><td><strong>300 uL/well</strong></td></tr><tr><td>Norgen wash buffer</td><td><strong>400 uL/well/wash, 3 washes</strong></td></tr><tr><td>Norgen elution buffer</td><td><strong>100 uL/well</strong> in current script</td></tr><tr><td>DNase master mix</td><td><strong>13 uL/well</strong></td></tr><tr><td>Zymo binding buffer</td><td><strong>226 uL/well</strong></td></tr><tr><td>Zymo EtOH</td><td><strong>339 uL/well</strong></td></tr><tr><td>RNA prep buffer</td><td><strong>400 uL/well</strong></td></tr><tr><td>Zymo wash 1</td><td><strong>700 uL/well</strong></td></tr><tr><td>Zymo wash 2</td><td><strong>400 uL/well</strong></td></tr><tr><td>Final nuclease-free water</td><td><strong>15 uL/well</strong></td></tr></tbody></table>
+<p><strong>Critical step:</strong> pre-warmed slurry and lysis buffer can crystallize or clog tips</p>
+<p>if cooled. Work promptly after vortexing and loading these reagents.</p>
+<h2>Robot and Labware Calibration</h2>
+<p>Before processing clinical or precious samples:</p>
+<ol>
+<li>Confirm pipette offset and tip length calibration.</li>
+<li>Confirm deck calibration.</li>
+<li>Confirm custom labware offsets in the exact slots used by these scripts.</li>
+<li>Run a dry positioning check for every custom labware and low aspiration height.</li>
+<li>Run a water or mock-liquid test for transfer recovery and decant behavior.</li>
+</ol>
+<p><strong>Critical step:</strong> <code>well.bottom(0)</code> is the mathematical bottom from the labware</p>
+<p>definition. It is not a guaranteed physical clearance. Calibration error, tip</p>
+<p>length variation and plastic tolerance can make <code>bottom(0)</code> hit the labware.</p>
+<p>Validate these low/sensitive positions before production:</p>
+<table><thead><tr><th>Step</th><th>Operation</th><th>Position</th></tr></thead><tbody><tr><td>Step 1</td><td>slurry aspiration</td><td>reservoir <strong><code>bottom(2)</code></strong></td></tr><tr><td>Step 3</td><td>decant</td><td>48-well staged heights down to <strong><code>bottom(4)</code></strong></td></tr><tr><td>Step 4</td><td>sample transfer</td><td>48-well <strong><code>bottom(1.7)</code></strong></td></tr><tr><td>Step 6</td><td>Zymo transfer source</td><td>Thermo Scientific Nunc 2 mL plate <strong><code>bottom(0.3)</code></strong></td></tr></tbody></table>
+<h2>Procedure</h2>
+<h3>RNA Extraction</h3>
+<p><strong>Timing:</strong> about 11-11.5 h per 48-sample batch with the current scripts. Step 3</p>
+<p>is the major bottleneck.</p>
+<p><strong>Estimated p300 multichannel version:</strong> about 2.5-4 h per 48-sample batch,</p>
+<p>assuming full columns and validated 48-well/filter plate alignment.</p>
+<h4>Step 1 (<code>1_add_slurry_lysis.py</code>): Slurry and lysis buffer addition</h4>
+<p>Script: <code>1_add_slurry_lysis.py</code></p>
+<p><strong>Timing:</strong> about 35 min for 48 samples with the current p300 single-channel</p>
+<p>script.</p>
+<p><strong>Estimated p300 multichannel version:</strong> about 25-40 min for 48 samples, assuming</p>
+<p>full columns and validated slurry/lysis handling.</p>
+<p>Current deck layout:</p>
+<table><thead><tr><th>Slot</th><th>Labware</th><th>Contents</th></tr></thead><tbody><tr><td>1</td><td><code>nest_1_reservoir_195ml</code></td><td>lysis buffer A + 1.2% B-ME</td></tr><tr><td>2</td><td><code>custom_48_wellplate_7000ul</code></td><td>48-well plate for lysis step</td></tr><tr><td>4</td><td><code>nest_1_reservoir_195ml</code></td><td>slurry, about 10.5 mL</td></tr><tr><td>5</td><td><code>custom_48_wellplate_7000ul</code></td><td>48-well plate for slurry step</td></tr><tr><td>9</td><td><code>opentrons_96_tiprack_300ul</code></td><td>p300 tips</td></tr></tbody></table>
+<ol>
+<li>Place the 48-well plate at slot 5.</li>
+<li>Vortex preheated slurry thoroughly.</li>
+<li>Add about <strong>10.5 mL slurry</strong> to the reservoir at slot 4.</li>
+<li>Start or resume <code>1_add_slurry_lysis.py</code>.</li>
+<li>The robot adds <strong>200 uL slurry</strong> to each target well. The current script aspirates slurry from <strong><code>bottom(2)</code></strong> at slow rate and dispenses near the top of each 48-well.</li>
+<li>When prompted, move the 48-well plate to slot 2.</li>
+<li>Add about <strong>40 mL preheated lysis buffer plus 1.2% B-ME</strong> to the slot 1 reservoir. Refill in about <strong>40 mL</strong> batches if needed.</li>
+<li>Resume the robot.</li>
+<li>The robot adds <strong>1800 uL lysis buffer per well</strong>, split into serial p300 dispenses.</li>
+</ol>
+<p><strong>Pause point:</strong> after lysis buffer addition, proceed manually to sample addition.</p>
+<h4>Step 2 (manual): Sample addition and incubation</h4>
+<p>No OT-2 script.</p>
+<p><strong>Timing:</strong> 15-25 min.</p>
+<ol>
+<li>Add samples manually to the lysis/slurry plate.</li>
+<li>Mix each column <strong>at least 5 times</strong> with a P1000 multichannel.</li>
+<li>Seal the plate.</li>
+<li>Incubate at <strong>60 C for 10 min</strong>.</li>
+<li>Return the plate to the robot area for Step 3.</li>
+</ol>
+<p><strong>Critical step:</strong> keep the plate sealed except during active pipetting. Move</p>
+<p>quickly after vortexing or mixing so slurry does not settle.</p>
+<h4>Step 3 (<code>3_etoh_centrifuge.py</code>): EtOH addition, pellet, decant, re-lysis and EtOH wash</h4>
+<p>Script: <code>3_etoh_centrifuge.py</code></p>
+<p><strong>Timing:</strong> about 8 h for 48 samples with the current p300 single-channel script.</p>
+<p><strong>Estimated p300 multichannel version:</strong> about 1-1.5 h if EtOH addition, re-lysis,</p>
+<p>EtOH wash and decant are all converted to column-wise operations and</p>
+<p>multi-channel decant is validated with mock slurry.</p>
+<p>Current deck layout:</p>
+<table><thead><tr><th>Slot</th><th>Labware</th><th>Contents</th></tr></thead><tbody><tr><td>1</td><td><code>nest_1_reservoir_195ml</code></td><td>200-proof EtOH, about 150 mL</td></tr><tr><td>2</td><td><code>custom_48_wellplate_7000ul</code></td><td>48-well sample plate</td></tr><tr><td>3</td><td><code>nest_1_reservoir_195ml</code></td><td>re-lysis buffer, later EtOH wash</td></tr><tr><td>5</td><td><code>custom_48_wellplate_7000ul</code></td><td>open liquid waste container</td></tr><tr><td>8</td><td><code>opentrons_96_tiprack_300ul</code></td><td>p300 tips</td></tr><tr><td>9</td><td><code>opentrons_96_tiprack_300ul</code></td><td>p300 tips</td></tr></tbody></table>
+<ol>
+<li>Place the sealed 48-well sample plate at slot 2.</li>
+<li>Add about <strong>150 mL 200-proof EtOH</strong> to the slot 1 reservoir.</li>
+<li>Load p300 tip racks at slots 8 and 9.</li>
+<li>Remove the plate seal.</li>
+<li>Resume the robot.</li>
+<li>The current script adds <strong>3000 uL EtOH per well</strong> with p300, split into <strong>12 transfers of 250 uL</strong>.</li>
+<li>When prompted, <strong>seal the plate and vortex at least 30 s</strong> to mix EtOH with sample. Briefly spin or tap down if liquid remains on the seal or well walls.</li>
+</ol>
+<p><strong>Optimization note:</strong> with <code>p1000_single_gen2</code>, the 3000 uL EtOH addition should</p>
+<p>be refactored to about 3-4 transfers per well. This is one of the largest speed</p>
+<p>gains available.</p>
+<ol>
+<li>Centrifuge <strong>30 sec at 1,000g</strong> at room temperature to pellet slurry.</li>
+<li>Return the plate to slot 2 unsealed.</li>
+<li>Place an open liquid-waste container at slot 5.</li>
+<li>Resume the robot.</li>
+<li>The robot decants supernatant from each target well using staged heights: <strong>37, 34, 30, 26, 22, 18, 14, 10, 8, 6, 5 and 4 mm above bottom</strong>. Each height is used for <strong>two 250 uL aspirations at rate 0.5</strong>.</li>
+</ol>
+<p><strong>Critical step:</strong> decant is pellet-sensitive. If using a modified p1000 or</p>
+<p>multi-channel decant, validate with mock slurry first. Do not optimize this step</p>
+<p>purely for speed.</p>
+<ol>
+<li>Remove the liquid-waste container from slot 5.</li>
+<li>Add <strong>20 mL preheated lysis buffer</strong> to the slot 3 reservoir.</li>
+<li>Resume the robot. The robot adds <strong>300 uL re-lysis buffer per well</strong>.</li>
+<li><strong>Seal the plate and vortex at least 30 s</strong>.</li>
+<li>Incubate at <strong>60 C for 10 min</strong>.</li>
+<li>If this is the first 48-sample batch, keep the incubator at <strong>60 C</strong>. If this is the second 48-sample batch, set the incubator to <strong>37 C</strong> for DNase.</li>
+<li>Empty the slot 3 reservoir and add <strong>20 mL 200-proof EtOH</strong>.</li>
+<li>Remove the seal from the plate and return it to slot 2.</li>
+<li>Resume the robot. The robot adds <strong>300 uL EtOH wash per well</strong>.</li>
+<li><strong>Seal the plate and vortex 1 min</strong>.</li>
+</ol>
+<p><strong>Pause point:</strong> proceed immediately to Norgen transfer, or keep the plate sealed</p>
+<p>briefly while preparing Step 4.</p>
+<h4>Step 4 (<code>4_transfer_to_filter.py</code>): Transfer to Norgen filter plate</h4>
+<p>Script: <code>4_transfer_to_filter.py</code></p>
+<p><strong>Timing:</strong> about 1 h for 48 samples with the current p300 single-channel script.</p>
+<p><strong>Estimated p300 multichannel version:</strong> about 15-25 min for 48 samples, assuming</p>
+<p>full columns and validated 48-well to Norgen filter alignment.</p>
+<p>Current deck layout:</p>
+<table><thead><tr><th>Slot</th><th>Labware</th><th>Contents</th></tr></thead><tbody><tr><td>2</td><td><code>custom_48_wellplate_7000ul</code></td><td>vortexed 48-well sample plate</td></tr><tr><td>5</td><td><code>custom_norgen_96filterplate</code></td><td>Norgen filter plate on collection plate</td></tr><tr><td>8</td><td><code>opentrons_96_tiprack_300ul</code></td><td>p300 tips</td></tr></tbody></table>
+<ol>
+<li>Place the vortexed 48-well plate at slot 2.</li>
+<li>Place the Norgen filter plate on its collection plate at slot 5. Confirm A1 is top-left in the expected orientation.</li>
+<li>Set <code>FILTER_COL_START=0</code> for batch 1 or <code>FILTER_COL_START=6</code> for batch 2.</li>
+<li>Start or resume <code>4_transfer_to_filter.py</code>.</li>
+<li>At each source-column prompt, <strong>vortex the 48-well plate briefly</strong>, focusing on the active column.</li>
+<li><strong>Remove the seal only from the active source column</strong>.</li>
+<li>Resume the robot.</li>
+<li>For each well, the current script mixes <strong>3 x 250 uL at <code>bottom(2)</code></strong>, then transfers <strong>3 x 230 uL = 690 uL</strong> from source <strong><code>bottom(1.7)</code></strong> into Norgen filter <strong><code>top(-5)</code></strong> with a <strong>10 uL air gap</strong> each time.</li>
+<li>Repeat the prompt/resume process until all target wells are transferred.</li>
+<li>Centrifuge the Norgen filter plate with collection plate underneath for <strong>2 min at maximum speed or 2,000 RPM</strong> at room temperature.</li>
+</ol>
+<p><strong>Critical step:</strong> the Norgen filter plate must sit squarely on its collection</p>
+<p>plate. Verify orientation before centrifugation and before returning to the</p>
+<p>robot.</p>
+<h4>Step 5 (<code>5_norgen_wash.py</code>): Norgen filter wash on kit collection plate</h4>
+<p>Script: <code>5_norgen_wash.py</code></p>
+<p><strong>Timing:</strong> about 1.5 h for 48 samples with the current p300 single-channel script.</p>
+<p><strong>Estimated p300 multichannel version:</strong> about 30-45 min for 48 samples.</p>
+<p>Current deck layout:</p>
+<table><thead><tr><th>Slot</th><th>Labware</th><th>Contents</th></tr></thead><tbody><tr><td>1</td><td><code>nest_1_reservoir_195ml</code></td><td>Norgen wash buffer</td></tr><tr><td>2</td><td><code>custom_norgen_96filterplate</code></td><td>Norgen filter plate on collection plate</td></tr><tr><td>9</td><td><code>opentrons_96_tiprack_300ul</code></td><td>p300 tips</td></tr></tbody></table>
+<ol>
+<li>Place the centrifuged Norgen filter plate on its collection plate at slot 2.</li>
+<li>Add <strong>24 mL Norgen wash buffer</strong> to the slot 1 reservoir.</li>
+<li>Resume Wash 1. The robot adds <strong>400 uL wash buffer per well</strong>.</li>
+<li>Centrifuge <strong>2 min at maximum speed or 2,000 RPM</strong> at room temperature.</li>
+<li>Discard flow-through.</li>
+<li>Repeat Steps 48-52 for Wash 2.</li>
+<li>Repeat the wash addition once more for Wash 3.</li>
+<li>After Wash 3, centrifuge <strong>5 min at 2,000 RPM</strong> at room temperature for dry spin.</li>
+<li>Discard flow-through.</li>
+<li>Discard flow-through.</li>
+</ol>
+<h4>Step 5b (<code>5b_norgen_elute.py</code>): Norgen elution into 2 mL deep-well plate</h4>
+<p>Script: <code>5b_norgen_elute.py</code></p>
+<p>Current deck layout:</p>
+<table><thead><tr><th>Slot</th><th>Labware</th><th>Contents</th></tr></thead><tbody><tr><td>2</td><td><code>custom_norgen_96filterplate_on_2ml_deep</code></td><td>Norgen filter plate on clean 2 mL deep-well elution plate</td></tr><tr><td>4</td><td><code>nest_1_reservoir_195ml</code></td><td>Norgen elution buffer</td></tr><tr><td>9</td><td><code>opentrons_96_tiprack_300ul</code></td><td>p300 tips</td></tr></tbody></table>
+<ol>
+<li><strong>Replace the kit collection plate with a clean NEST 96-well 2 mL deep-well elution plate. Align A1 over A1.</strong></li>
+<li>Add <strong>10 mL elution buffer</strong> to the single-channel reservoir at slot 4.</li>
+<li>Place filter plus 2 mL deep-well elution plate at slot 2.</li>
+<li>Resume <code>5b_norgen_elute.py</code>. The robot adds <strong>100 uL elution buffer per well</strong>.</li>
+<li>Centrifuge filter plus elution plate for <strong>2 min at maximum speed or 2,000 RPM</strong> at room temperature.</li>
+<li>Confirm approximately <strong>100 uL eluate</strong> in each expected elution well.</li>
+</ol>
+<p><strong>Pause point:</strong> if processing a 96-sample run and this is batch 1, seal the</p>
+<p>elution plate and refrigerate it while processing batch 2. Continue with the</p>
+<p>second 48-sample batch from Step 1, using <code>FILTER_COL_START=6</code> for Step 4 and</p>
+<p>Step 5.</p>
+<h3>DNA Digestion</h3>
+<h4>Step 5c (<code>5c_dnase_digestion.py</code> or manual P20): DNase addition and incubation</h4>
+<p>Script: <code>5c_dnase_digestion.py</code>, or manual P20 multichannel if no p20 is</p>
+<p>mounted.</p>
+<p><strong>Timing:</strong> about 1 h with the current p20 single-channel script.</p>
+<p><strong>Estimated p300 multichannel version:</strong> not applicable; DNase addition is 13 uL</p>
+<p>per well and should remain p20 single, p20 multichannel or manual P20</p>
+<p>multichannel.</p>
+<p>Current deck layout for robot p20 mode:</p>
+<table><thead><tr><th>Slot</th><th>Labware</th><th>Contents</th></tr></thead><tbody><tr><td>2</td><td><code>thermoscientificnunc_96_wellplate_2000ul</code></td><td>Norgen elution plate</td></tr><tr><td>4</td><td>dynamic source: <code>opentrons_24_aluminumblock_nest_2ml_snapcap</code> with LoBind tube(s), or <code>nest_1_reservoir_195ml</code></td><td>DNase master mix</td></tr><tr><td>6</td><td><code>opentrons_96_tiprack_20ul</code></td><td>p20 tips</td></tr></tbody></table>
+<ol>
+<li>Prepare DNase master mix on ice. Each sample requires <strong>11 uL 10x DNase buffer and 2 uL DNase</strong>. Include <strong>10% excess</strong>.</li>
+<li>If using robot p20 mode, add master mix to the slot 4 source prompted by <code>5c_dnase_digestion.py</code>: LoBind tube A1/A2 in a 24-well aluminum block for small volumes, or a 195 mL reservoir for large volumes. For <code>N_SAMPLES=8</code>, prepare <strong>114 uL</strong> total and place it in LoBind tube A1.</li>
+<li>Place the Norgen elution plate at slot 2.</li>
+<li>Resume <code>5c_dnase_digestion.py</code>. The robot adds <strong>13 uL master mix per well</strong> at <code>bottom(5)</code> and performs a blowout at <code>bottom(8)</code> in the same well.</li>
+</ol>
+<p>    <strong>Recommend using manual P20 for this step.</strong></p>
+<ol>
+<li>If using manual mode, add <strong>13 uL DNase master mix</strong> to each sample well with a P20 multichannel pipette.</li>
+<li><strong>Seal the plate and vortex lightly</strong>.</li>
+<li>Incubate <strong>20 min at 37 C</strong>.</li>
+</ol>
+<p><strong>Pause point:</strong> during the DNase incubation, prepare Zymo filter plate, collection</p>
+<p>plate, binding buffer, EtOH, RNA prep buffer, wash buffer and nuclease-free</p>
+<p>water for Step 6.</p>
+<h3>RNA Cleaning and Concentration</h3>
+<p><strong>Timing:</strong> about 1 h for 48 samples with the current p300/p20 single-channel</p>
+<p>script.</p>
+<p><strong>Estimated p300 multichannel version:</strong> about 1-1.5 h for 48 samples, assuming</p>
+<p>binding, EtOH, Zymo loading, prep buffer and wash additions are converted to</p>
+<p>column-wise operations. Final 15 uL elution still requires p20 or manual P20</p>
+<p>multichannel.</p>
+<h4>Step 6 (<code>6_zymo_clean_conc.py</code>): Zymo cleanup</h4>
+<p>Script: <code>6_zymo_clean_conc.py</code></p>
+<p>Current deck layout:</p>
+<table><thead><tr><th>Slot</th><th>Labware</th><th>Contents</th></tr></thead><tbody><tr><td>1</td><td><code>nest_1_reservoir_195ml</code></td><td>wash buffer round 1</td></tr><tr><td>2</td><td><code>custom_zymo_96filterplate</code></td><td>Zymo filter plate on collection/elution plate</td></tr><tr><td>3</td><td><code>thermoscientificnunc_96_wellplate_2000ul</code></td><td>post-DNase sample plate</td></tr><tr><td>4</td><td>dynamic source: <code>opentrons_24_aluminumblock_nest_2ml_snapcap</code> with LoBind tube(s), or <code>nest_1_reservoir_195ml</code></td><td>binding buffer, EtOH, RNA prep buffer, wash 2 and nuclease-free water</td></tr><tr><td>6</td><td><code>opentrons_96_tiprack_20ul</code></td><td>p20 tips</td></tr><tr><td>8</td><td><code>opentrons_96_tiprack_300ul</code></td><td>p300 tips</td></tr><tr><td>9</td><td><code>opentrons_96_tiprack_300ul</code></td><td>p300 tips</td></tr></tbody></table>
+<ol>
+<li>Place the post-DNase sample plate at slot 3.</li>
+<li>Place the slot 4 reagent source prompted by <code>6_zymo_clean_conc.py</code> containing binding buffer. For one 8-well column, this is about <strong>2.2 mL including excess</strong> and will usually use LoBind tube(s) in a 24-well aluminum block.</li>
+<li>Load p300 tip racks at slots 8 and 9.</li>
+<li>Press Resume in the Opentrons App. The robot adds <strong>226 uL binding buffer per well</strong> and performs a high blowout in each well.</li>
+<li>Empty or replace the slot 4 reagent source and add the <strong>100% EtOH volume prompted by <code>6_zymo_clean_conc.py</code></strong>. For one 8-well column, this is about <strong>3.3 mL including excess</strong> and will usually use LoBind tube(s).</li>
+<li>Press Resume in the Opentrons App. The robot adds <strong>339 uL EtOH per well</strong> and performs a high blowout in each well.</li>
+<li>Remove the sample plate from slot 3.</li>
+<li><strong>Seal and vortex at least 30 s</strong>.</li>
+<li>Return sample plate to slot 3.</li>
+<li>Place Zymo filter plate on collection plate at slot 2.</li>
+<li>Press Resume in the Opentrons App. The current script transfers <strong>3 x 226 uL per well</strong> from the Thermo Scientific Nunc 2 mL sample plate at <strong><code>bottom(0.3)</code></strong> to the Zymo filter plate, dispensing to the Zymo filter at <strong><code>top(-5)</code></strong> with high blowout.</li>
+</ol>
+<p><strong>Critical step:</strong> the current Step 6 transfer aspirates from <code>bottom(0.3)</code>. Validate</p>
+<p>this height physically before production. If the tip touches the bottom or flow</p>
+<p>is restricted, raise the final aspiration height and accept a small residual</p>
+<p>volume.</p>
+<ol>
+<li>Centrifuge the Zymo filter plate for <strong>5 min at 3,000-5,000g</strong> at room temperature.</li>
+<li>Discard flow-through and reassemble the filter plate with the collection plate.</li>
+<li>Empty or replace the slot 4 reagent source and add the <strong>RNA prep buffer volume prompted by <code>6_zymo_clean_conc.py</code></strong>. For one 8-well column, this is about <strong>3.8 mL including excess</strong>.</li>
+<li>Place the filter plate at slot 2 and press Resume in the Opentrons App. The robot adds <strong>400 uL RNA prep buffer per well</strong> and performs a high blowout in each well.</li>
+<li>Centrifuge <strong>5 min at 3,000-5,000g</strong>.</li>
+<li>Discard flow-through and reassemble the plate.</li>
+<li>Replace the slot 1 reservoir with a 195 mL single-channel reservoir containing the <strong>wash buffer round 1 volume prompted by <code>6_zymo_clean_conc.py</code></strong>. For one 8-well column, this is about <strong>6.7 mL including excess</strong>.</li>
+<li>Press Resume in the Opentrons App. The robot adds <strong>700 uL wash buffer per well</strong> and performs a high blowout in each well.</li>
+<li>Centrifuge <strong>5 min at 3,000-5,000g</strong>.</li>
+<li>Discard flow-through and replace the collection plate with a new one.</li>
+<li>Empty or replace the slot 4 reagent source and add the <strong>wash buffer round 2 volume prompted by <code>6_zymo_clean_conc.py</code></strong>. For one 8-well column, this is about <strong>3.8 mL including excess</strong>.</li>
+<li>Press Resume in the Opentrons App. The robot adds <strong>400 uL wash buffer per well</strong> and performs a high blowout in each well.</li>
+<li>Centrifuge <strong>5 min at 3,000-5,000g</strong>.</li>
+<li>Discard flow-through and dispose of the collection plate.</li>
+<li><strong>Place the Zymo filter plate on a new final elution plate. Align A1 over A1.</strong></li>
+<li>Empty or replace the slot 4 reagent source and add the nuclease-free water volume prompted by <code>6_zymo_clean_conc.py</code>. For the current script, this is <strong>1 mL</strong> and will usually use LoBind tube A1.</li>
+<li>If using robot p20 mode, press Resume in the Opentrons App. The robot adds <strong>15 uL water per well</strong> and performs a high blowout in each well.</li>
+</ol>
+<p>    <strong>Recommend using manual P20 for this step.</strong></p>
+<ol>
+<li>If using manual mode, add <strong>15 uL nuclease-free water</strong> to each sample well with a P20 multichannel pipette. Wet the filter membrane and avoid splashing the side walls.</li>
+<li>Centrifuge filter plus elution plate for <strong>5 min at 3,000-5,000g</strong>.</li>
+<li>Confirm approximately <strong>15 uL loaded per well</strong>; recovered eluate volume may be lower because some liquid can remain in the column.</li>
+<li>Aliquot eluted cfRNA as needed and freeze at <strong>-80 C</strong>.</li>
+</ol>
+<h2>Post-Run Quality Control</h2>
+<p><strong>RNA quality check:</strong> after cfRNA extraction from plasma samples, estimate isolated RNA concentrations using the Bioanalyzer RNA 6000 Pico Kit (5067-1513, Agilent) according to the manufacturer&#x27;s instructions.</p>
+<p>Recommended checks:</p>
+<ol>
+<li>Confirm expected eluate volumes after Norgen elution and final Zymo elution.</li>
+<li>For production samples, select wells across rows and columns for RNA quality assessment.</li>
+<li>For validation runs, include blank wells and spike-in controls to monitor cross-contamination and recovery.</li>
+<li>Record any wells with visible filter failure, clogging, low eluate volume or pipetting abnormality.</li>
+</ol></body></html>
