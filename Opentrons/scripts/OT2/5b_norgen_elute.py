@@ -44,9 +44,9 @@ except ImportError:
     ZYMO_FILTER='custom_zymo_96filterplate'    # simulation substitute
 
 # Pilot defaults; environment variables can still override these per run.
-N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
-FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
-TIP_START=int(os.environ.get('TIP_START','24'))   # after Step 5 uses 3 more p300 tips
+N_SAMPLES=int(os.environ.get('N_SAMPLES','4'))
+FILTER_COL_START=int(os.environ.get('FILTER_COL_START','6'))
+TIP_START=int(os.environ.get('TIP_START','15'))   # after Step 5 uses 3 more p300 tips
 WELL_START=int(os.environ.get('WELL_START','0'))  # unused by this column-wise script
 TUBE_BLOCK_2ML = globals().get('TUBE_BLOCK_2ML', 'opentrons_24_aluminumblock_nest_2ml_snapcap')
 
@@ -119,11 +119,14 @@ def source_prompt(slot, total_ul, label):
 
 def run(protocol: protocol_api.ProtocolContext):
 
-    n_cols = max(1, math.ceil(N_SAMPLES / 8))
-    start  = FILTER_COL_START
-    stop   = start + n_cols
-    n_wells = n_cols * 8
-    elu_total_ul = n_wells * ELU_VOL * REAGENT_EXCESS
+    # n_cols = max(1, math.ceil(N_SAMPLES / 8))
+    # start  = FILTER_COL_START
+    # stop   = start + n_cols
+    # n_wells = n_cols * 8
+    # elu_total_ul = n_wells * ELU_VOL * REAGENT_EXCESS
+
+    # not always run through entire column, for only 4 samples in batch 1
+    elu_total_ul = N_SAMPLES * ELU_VOL * REAGENT_EXCESS
 
     # ── Labware ───────────────────────────────────────────────────────────
     tips_300      = protocol.load_labware(TIPS_300,        9)
@@ -136,20 +139,30 @@ def run(protocol: protocol_api.ProtocolContext):
 
     elu_src  = make_source(elu_res, elu_total_ul)
 
-    target_cols = filter_plate.columns()[start:stop]
+    # target_cols = filter_plate.columns()[start:stop]
+    target_cols = filter_plate.columns()[FILTER_COL_START:FILTER_COL_START + math.ceil(N_SAMPLES / 8)]
 
     protocol.pause(
-        "STEP 5b  ▶  Remove the kit collection plate and place the Norgen filter plate "
+        "STEP 5b  ▶  Remove the 2 mL deep-well collection plate and place the Norgen filter plate "
         "on a clean NEST 96-well 2 mL deep-well elution plate at SLOT 2. "
         f"{source_prompt(4, elu_total_ul, 'Norgen elution buffer')} Resume."
     )
 
+    # p300.pick_up_tip()
+    # for col in target_cols:
+    #     for well in col:
+    #         p300.aspirate(ELU_VOL, elu_src.aspiration_location(ELU_VOL))
+    #         p300.dispense(ELU_VOL, well.top(-5))
+    #         p300.blow_out(well.top(-5))
+    # p300.drop_tip()
+
+    # only 4 samples in batch 1, so just do 4 wells in first column instead of whole column
     p300.pick_up_tip()
-    for col in target_cols:
-        for well in col:
-            p300.aspirate(ELU_VOL, elu_src.aspiration_location(ELU_VOL))
-            p300.dispense(ELU_VOL, well.top(-5))
-            p300.blow_out(well.top(-5))
+    for i in range(N_SAMPLES):
+        well = target_cols[0][i]
+        p300.aspirate(ELU_VOL, elu_src.aspiration_location(ELU_VOL))
+        p300.dispense(ELU_VOL, well.top(-5))
+        p300.blow_out(well.top(-5))
     p300.drop_tip()
 
     protocol.comment(

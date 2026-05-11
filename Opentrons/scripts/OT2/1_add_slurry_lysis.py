@@ -27,7 +27,7 @@ except ImportError:
     START_COL=int(os.environ.get('START_COL','0'))
     STOP_COL=int(os.environ.get('STOP_COL','6'))
     FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
-    N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
+    N_SAMPLES=int(os.environ.get('N_SAMPLES','4'))
     TIP_START=int(os.environ.get('TIP_START','0'))    # 0=A1, 1=B1, ..., 8=A2
     WELL_START=int(os.environ.get('WELL_START','0'))  # 0=A1, 1=B1, ..., 9=A2
     TIPS_200='opentrons_96_filtertiprack_200ul'
@@ -43,7 +43,7 @@ except ImportError:
     ZYMO_FILTER='custom_zymo_96filterplate'    # simulation substitute
 
 # Pilot defaults; environment variables can still override these per run.
-N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
+N_SAMPLES=int(os.environ.get('N_SAMPLES','4'))
 TIP_START=int(os.environ.get('TIP_START','0'))    # fresh tip box; 0=A1, 1=B1, ..., 8=A2
 WELL_START=int(os.environ.get('WELL_START','0'))  # 0=A1, 1=B1, ..., 8=A2
 TUBE_BLOCK_2ML = globals().get('TUBE_BLOCK_2ML', 'opentrons_24_aluminumblock_nest_2ml_snapcap')
@@ -146,7 +146,7 @@ def run(protocol: protocol_api.ProtocolContext):
 
     p300.pick_up_tip()
     for well in target_wells:
-        p300.mix(1, 100, slurry_src.aspiration_location(0))
+        p300.mix(2, 100, slurry_src.aspiration_location(0))
         p300.aspirate(SLURRY_VOL, slurry_src.aspiration_location(SLURRY_VOL), rate=0.2)
         protocol.delay(seconds=1.5)
         p300.air_gap(10)

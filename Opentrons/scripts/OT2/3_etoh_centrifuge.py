@@ -45,8 +45,8 @@ except ImportError:
     ZYMO_FILTER='custom_zymo_96filterplate'    # simulation substitute
 
 # Pilot defaults; environment variables can still override these per run.
-N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
-TIP_START=int(os.environ.get('TIP_START','2'))    # after Step 1 uses 2 p300 tips
+N_SAMPLES=int(os.environ.get('N_SAMPLES','4'))
+TIP_START=int(os.environ.get('TIP_START','1'))    # after Step 1 uses 2 p300 tips
 WELL_START=int(os.environ.get('WELL_START','0'))  # 0=A1, 1=B1, ..., 8=A2
 TUBE_BLOCK_2ML = globals().get('TUBE_BLOCK_2ML', 'opentrons_24_aluminumblock_nest_2ml_snapcap')
 
@@ -238,6 +238,7 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.drop_tip()
 
     protocol.comment(
-        "Step 3 complete. Seal plate and vortex 1 min. "
-        "Proceed to Step 4 (transfer to Norgen filter plate)."
+        "Step 3 complete. Fully seal the plate, vortex 30 sec to resuspend "
+        "the final slurry/EtOH mixture, briefly spin or tap down liquid from "
+        "the seal/walls, and proceed immediately to Step 4."
     )

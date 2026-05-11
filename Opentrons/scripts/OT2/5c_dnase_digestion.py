@@ -41,8 +41,8 @@ except ImportError:
     ZYMO_FILTER='custom_zymo_96filterplate'
 
 # Pilot defaults; environment variables can still override these per run.
-N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
-FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
+N_SAMPLES=int(os.environ.get('N_SAMPLES','4'))
+FILTER_COL_START=int(os.environ.get('FILTER_COL_START','6'))
 TIP_START=int(os.environ.get('TIP_START','0'))    # fresh p20 rack in slot 6
 WELL_START=int(os.environ.get('WELL_START','0'))  # unused by this column-wise script
 TUBE_BLOCK_2ML = globals().get('TUBE_BLOCK_2ML', 'opentrons_24_aluminumblock_nest_2ml_snapcap')
@@ -115,11 +115,15 @@ def source_prompt(slot, total_ul, label, force_reservoir=False):
 
 def run(protocol: protocol_api.ProtocolContext):
 
-    n_cols = max(1, math.ceil(N_SAMPLES / 8))
-    start  = FILTER_COL_START
-    stop   = start + n_cols
-    n_wells = n_cols * 8
-    master_mix_ul = round(n_wells * DNASE_VOL * 1.1)   # 10% excess
+    # n_cols = max(1, math.ceil(N_SAMPLES / 8))
+    # start  = FILTER_COL_START
+    # stop   = start + n_cols
+    # n_wells = n_cols * 8
+    # master_mix_ul = round(n_wells * DNASE_VOL * 1.1)   # 10% excess
+
+    # not always run through entire column, for only 4 samples in batch 1
+    n_wells = N_SAMPLES
+    master_mix_ul = round(n_wells * DNASE_VOL * 1.2)   # 20% excess to ensure enough for 4 samples
 
     # ── Labware ───────────────────────────────────────────────────────────
     tips_20       = protocol.load_labware('opentrons_96_tiprack_20ul', 6)
@@ -131,21 +135,31 @@ def run(protocol: protocol_api.ProtocolContext):
     p20.starting_tip = tips_20.wells()[TIP_START]
 
     dnase_src   = make_source(dnase_res, master_mix_ul)
-    target_cols = elution_plate.columns()[start:stop]
+    # target_cols = elution_plate.columns()[start:stop]
+    target_cols = elution_plate.columns()[FILTER_COL_START:FILTER_COL_START + math.ceil(N_SAMPLES / 8)]
 
     protocol.pause(
         f"STEP 5c  ▶  Place the 2 mL deep-well elution plate (from Step 5b) at SLOT 2. "
         f"Prepare DNase master mix: 11 µL 10× DNase buffer + 2 µL DNase per well "
-        f"({master_mix_ul} µL total for {n_wells} wells, 10% excess). "
+        f"({master_mix_ul} µL total for {n_wells} wells, 20% excess). "
         f"{source_prompt(4, master_mix_ul, 'DNase master mix')} Resume."
     )
 
+    # p20.pick_up_tip()
+    # for col in target_cols:
+    #     for well in col:
+    #         p20.aspirate(DNASE_VOL, dnase_src.aspiration_location(DNASE_VOL))
+    #         p20.dispense(DNASE_VOL, well.bottom(5))
+    #         p20.blow_out(well.bottom(8))
+    # p20.drop_tip()
+
+    # only 4 samples in batch 1, so just do 4 wells in FILTER_COL_START instead of whole column
     p20.pick_up_tip()
-    for col in target_cols:
-        for well in col:
-            p20.aspirate(DNASE_VOL, dnase_src.aspiration_location(DNASE_VOL))
-            p20.dispense(DNASE_VOL, well.bottom(5))
-            p20.blow_out(well.bottom(8))
+    for i in range(N_SAMPLES):
+        well = target_cols[0][i]
+        p20.aspirate(DNASE_VOL, dnase_src.aspiration_location(DNASE_VOL))
+        p20.dispense(DNASE_VOL, well.bottom(5))
+        p20.blow_out(well.bottom(8))
     p20.drop_tip()
 
     protocol.comment(

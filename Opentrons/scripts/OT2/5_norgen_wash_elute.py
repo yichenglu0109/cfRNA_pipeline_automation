@@ -1,10 +1,9 @@
 """
 Deprecated compatibility stub.
 
-Step 5 is intentionally split because Norgen wash uses the kit collection plate
-under the filter, while Norgen elution uses a 2 mL deep-well receiver under the
-filter. Those two physical stacks need different labware definitions and should
-be run as separate protocols.
+Step 5 is intentionally split so the wash/dry-spin receiver can be discarded
+before Norgen elution. Both Step 5 wash and Step 5b elution use the Norgen
+filter plate on a 2 mL deep-well plate stack.
 
 Use:
   1. 5_norgen_wash.py
@@ -24,6 +23,6 @@ metadata = {
 def run(protocol: protocol_api.ProtocolContext):
     protocol.pause(
         "5_norgen_wash_elute.py is deprecated. Run 5_norgen_wash.py first, "
-        "then replace the kit collection plate with a clean 2 mL deep-well "
-        "elution plate and run 5b_norgen_elute.py."
+        "then replace the 2 mL deep-well collection plate with a clean 2 mL "
+        "deep-well elution plate and run 5b_norgen_elute.py."
     )

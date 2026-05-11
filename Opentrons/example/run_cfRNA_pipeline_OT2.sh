@@ -97,8 +97,8 @@ echo "[Step 4] Transfer to Norgen filter plate (col offset ${FILTER_COL_BATCH1})
 run_on_robot 4_transfer_to_filter.py \
     "N_SAMPLES=48 WELL_START=0 FILTER_COL_START=${FILTER_COL_BATCH1} TIP_START=0"
 
-# Step 5 – wash on kit collection plate, then elute into 2 mL deep-well plate
-echo "[Step 5] Norgen wash on kit collection plate (batch 1)" | tee -a "$LOG_FILE"
+# Step 5 – wash on 2 mL deep-well collection plate, then elute into a clean 2 mL deep-well plate
+echo "[Step 5] Norgen wash on 2 mL deep-well collection plate (batch 1)" | tee -a "$LOG_FILE"
 run_on_robot 5_norgen_wash.py \
     "N_SAMPLES=48 FILTER_COL_START=${FILTER_COL_BATCH1} TIP_START=0"
 
@@ -134,7 +134,7 @@ echo "[Step 4] Transfer to Norgen filter plate (batch 2, col offset 6)" | tee -a
 run_on_robot 4_transfer_to_filter.py \
     "N_SAMPLES=48 WELL_START=0 FILTER_COL_START=6 TIP_START=0"
 
-echo "[Step 5] Norgen wash on kit collection plate (batch 2, cols 7–12)" | tee -a "$LOG_FILE"
+echo "[Step 5] Norgen wash on 2 mL deep-well collection plate (batch 2, cols 7–12)" | tee -a "$LOG_FILE"
 run_on_robot 5_norgen_wash.py \
     "N_SAMPLES=48 FILTER_COL_START=6 TIP_START=0"
 

@@ -1,7 +1,7 @@
 # Semi-Automated cfRNA Extraction on OT-2
 
 Author: Peter Lu  
-Date: 2026-05-02
+Date: 2026-05-05
 
 The operating protocol for the OT-2 scripts in this directory. It is intended to be used by an operator standing at the robot. The OT-2 performs repetitive liquid handling; the user adds reagents, moves plates, centrifuges plates, seals/unseals plates, vortexes samples and verifies setup at each pause.
 
@@ -93,7 +93,8 @@ to p300-multi or p1000-single logic.
 Custom labware must be installed on the OT-2:
 
 - `custom_48_wellplate_7000ul`
-- `custom_norgen_96filterplate`
+- `custom_norgen_96filterplate_on_2ml_deep`
+- `custom_norgen_96filterplate` for legacy kit-collection setup only
 - `custom_zymo_96filterplate` with the current 60 mm stack height definition
 
 Standard labware used by scripts:
@@ -138,6 +139,15 @@ Before processing clinical or precious samples:
 3. Confirm custom labware offsets in the exact slots used by these scripts.
 4. Run a dry positioning check for every custom labware and low aspiration height.
 5. Run a water or mock-liquid test for transfer recovery and decant behavior.
+6. Run a 2-4 well mock slurry transfer test before real samples.
+
+Mock slurry acceptance criteria:
+
+- No visible slurry/resin pellet remains in the 48-well source after 30 sec vortexing.
+- Minimal visible slurry remains after Step 4 transfer.
+- Norgen filter wells receive consistent slurry-containing volume.
+- No leakage, splashing or well-to-well carryover occurs during mixing or transfer.
+- Record residue after vortexing only, after vortexing plus OT-2 mixing, and after transfer.
 
 **Critical step:** `well.bottom(0)` is the mathematical bottom from the labware
 definition. It is not a guaranteed physical clearance. Calibration error, tip
@@ -258,10 +268,10 @@ purely for speed.
 33. Empty the slot 3 reservoir and add **20 mL 200-proof EtOH**.
 34. Remove the seal from the plate and return it to slot 2.
 35. Resume the robot. The robot adds **300 uL EtOH wash per well**.
-36. **Seal the plate and vortex 1 min**.
+36. Fully seal the plate, vortex **30 sec** to resuspend the final slurry/EtOH mixture, then briefly spin or tap down liquid from the seal/walls.
 
-**Pause point:** proceed immediately to Norgen transfer, or keep the plate sealed
-briefly while preparing Step 4.
+**Critical step:** visible slurry residue at the bottom of a source well is a
+potential RNA loss point. Proceed immediately to Norgen transfer after vortexing.
 
 #### Step 4 (`4_transfer_to_filter.py`): Transfer to Norgen filter plate
 
@@ -275,26 +285,26 @@ Current deck layout:
 
 | Slot | Labware | Contents |
 |---|---|---|
-| 2 | `custom_48_wellplate_7000ul` | vortexed 48-well sample plate |
-| 5 | `custom_norgen_96filterplate` | Norgen filter plate on collection plate |
+| 2 | `custom_48_wellplate_7000ul` | freshly vortexed 48-well sample plate |
+| 5 | `custom_norgen_96filterplate_on_2ml_deep` | Norgen filter plate on 2 mL deep-well collection plate |
 | 8 | `opentrons_96_tiprack_300ul` | p300 tips |
 
-37. Place the vortexed 48-well plate at slot 2.
-38. Place the Norgen filter plate on its collection plate at slot 5. Confirm A1 is top-left in the expected orientation.
+37. Place the freshly vortexed 48-well plate at slot 2.
+38. Place the Norgen filter plate on a 2 mL deep-well collection plate at slot 5. Confirm A1 is top-left in the expected orientation.
 39. Set `FILTER_COL_START=0` for batch 1 or `FILTER_COL_START=6` for batch 2.
 40. Start or resume `4_transfer_to_filter.py`.
-41. At each source-column prompt, **vortex the 48-well plate briefly**, focusing on the active column.
-42. **Remove the seal only from the active source column**.
+41. At each source-column prompt, fully reseal the plate and vortex **30 sec**, focusing on the active column.
+42. Briefly spin or tap down liquid from the seal/walls. Remove the seal only from the active source column and visually confirm no visible slurry pellet remains.
 43. Resume the robot.
-44. For each well, the current script mixes **3 x 250 uL at `bottom(2)`**, then transfers **3 x 230 uL = 690 uL** from source **`bottom(1.7)`** into Norgen filter **`top(-5)`** with a **10 uL air gap** each time.
+44. For each well, the current script vigorously mixes **6 x 250 uL at `bottom(2)`** and **4 x 250 uL at `bottom(12)`** using the default mix rate, then performs a short **2 x 200 uL** bottom remix before each transfer aspirate. It transfers **3 x 230 uL = 690 uL** from source **`bottom(1.7)`** into Norgen filter **`top(-5)`** with a **10 uL air gap** each time.
 45. Repeat the prompt/resume process until all target wells are transferred.
-46. Centrifuge the Norgen filter plate with collection plate underneath for **2 min at maximum speed or 2,000 RPM** at room temperature.
+46. Centrifuge the Norgen filter plate with the 2 mL deep-well collection plate underneath for **2 min at maximum speed or 2,000 RPM** at room temperature.
 
-**Critical step:** the Norgen filter plate must sit squarely on its collection
-plate. Verify orientation before centrifugation and before returning to the
-robot.
+**Critical step:** the Norgen filter plate must sit squarely on the 2 mL
+deep-well collection plate. Verify orientation before centrifugation and before
+returning to the robot.
 
-#### Step 5 (`5_norgen_wash.py`): Norgen filter wash on kit collection plate
+#### Step 5 (`5_norgen_wash.py`): Norgen filter wash on 2 mL deep-well collection plate
 
 Script: `5_norgen_wash.py`
 
@@ -306,19 +316,19 @@ Current deck layout:
 | Slot | Labware | Contents |
 |---|---|---|
 | 1 | `nest_1_reservoir_195ml` | Norgen wash buffer |
-| 2 | `custom_norgen_96filterplate` | Norgen filter plate on collection plate |
+| 2 | `custom_norgen_96filterplate_on_2ml_deep` | Norgen filter plate on 2 mL deep-well collection plate |
 | 9 | `opentrons_96_tiprack_300ul` | p300 tips |
 
-47. Place the centrifuged Norgen filter plate on its collection plate at slot 2.
+47. Place the centrifuged Norgen filter plate on its 2 mL deep-well collection plate at slot 2.
 48. Add **24 mL Norgen wash buffer** to the slot 1 reservoir.
 49. Resume Wash 1. The robot adds **400 uL wash buffer per well**.
 50. Centrifuge **2 min at maximum speed or 2,000 RPM** at room temperature.
-51. Discard flow-through.
+51. Discard flow-through from the 2 mL deep-well collection plate.
 52. Repeat Steps 48-52 for Wash 2.
 53. Repeat the wash addition once more for Wash 3.
 54. After Wash 3, centrifuge **5 min at 2,000 RPM** at room temperature for dry spin.
-55. Discard flow-through.
-56. Discard flow-through.
+55. Discard flow-through from the 2 mL deep-well collection plate.
+56. Replace the 2 mL deep-well collection plate with a clean 2 mL deep-well elution plate before Step 5b.
 
 #### Step 5b (`5b_norgen_elute.py`): Norgen elution into 2 mL deep-well plate
 
@@ -332,7 +342,7 @@ Current deck layout:
 | 4 | `nest_1_reservoir_195ml` | Norgen elution buffer |
 | 9 | `opentrons_96_tiprack_300ul` | p300 tips |
 
-57. **Replace the kit collection plate with a clean NEST 96-well 2 mL deep-well elution plate. Align A1 over A1.**
+57. **Replace the 2 mL deep-well collection plate with a clean NEST 96-well 2 mL deep-well elution plate. Align A1 over A1.**
 58. Add **10 mL elution buffer** to the single-channel reservoir at slot 4.
 59. Place filter plus 2 mL deep-well elution plate at slot 2.
 60. Resume `5b_norgen_elute.py`. The robot adds **100 uL elution buffer per well**.

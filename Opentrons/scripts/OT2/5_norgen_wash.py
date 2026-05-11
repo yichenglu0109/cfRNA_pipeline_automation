@@ -6,7 +6,7 @@ Tips  : p300 × 3 tips (1 per wash × 3)
 Deck layout
 -----------
 Slot 1 : dynamic reagent source         – Norgen wash buffer
-Slot 2 : custom_norgen_96filterplate   – filter plate on kit collection plate
+Slot 2 : custom_norgen_96filterplate_on_2ml_deep – filter plate on 2 mL deep-well collection plate
 Slot 9 : opentrons_96_tiprack_300ul
 
 env var : START_COL  (0-indexed; 0 for batch 1, 6 for batch 2)
@@ -40,12 +40,14 @@ except ImportError:
     PCR_PLATE='nest_96_wellplate_100ul_pcr_full_skirt'
     PLATE_48='custom_48_wellplate_7000ul'       # simulation substitute
     NORGEN_FILTER='custom_norgen_96filterplate'  # simulation substitute
+    NORGEN_FILTER_ON_2ML='custom_norgen_96filterplate_on_2ml_deep'
     ZYMO_FILTER='custom_zymo_96filterplate'    # simulation substitute
 
 # Pilot defaults; environment variables can still override these per run.
-N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
-FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
-TIP_START=int(os.environ.get('TIP_START','21'))   # after Steps 1, 3 and 4 use 21 p300 tips
+N_SAMPLES=int(os.environ.get('N_SAMPLES','4'))
+FILTER_COL_START=int(os.environ.get('FILTER_COL_START','6')) # 0-indexed start column on filter plate; 0 for batch 1, 6 for batch 2
+# TIP_START=int(os.environ.get('TIP_START','21'))   # after Steps 1, 3 and 4 use 21 p300 tips
+TIP_START=int(os.environ.get('TIP_START','12'))    
 WELL_START=int(os.environ.get('WELL_START','0'))  # unused by this column-wise script
 TUBE_BLOCK_2ML = globals().get('TUBE_BLOCK_2ML', 'opentrons_24_aluminumblock_nest_2ml_snapcap')
 
@@ -118,59 +120,73 @@ def source_prompt(slot, total_ul, label):
 
 def run(protocol: protocol_api.ProtocolContext):
 
-    n_cols = max(1, math.ceil(N_SAMPLES / 8))
-    start  = FILTER_COL_START
-    stop   = start + n_cols
-    n_wells = n_cols * 8
-    wash_total_ul = n_wells * WASH_VOL * REAGENT_EXCESS
+    # n_cols = max(1, math.ceil(N_SAMPLES / 8))
+    # start  = FILTER_COL_START
+    # stop   = start + n_cols
+    # n_wells = n_cols * 8
+    # wash_total_ul = n_wells * WASH_VOL * REAGENT_EXCESS
+
+    # not always run through entire column, for only 4 samples in batch 1
+    wash_total_ul = N_SAMPLES * WASH_VOL * REAGENT_EXCESS
 
     # ── Labware ───────────────────────────────────────────────────────────
     tips_300      = protocol.load_labware(TIPS_300,        9)
-    filter_plate  = protocol.load_labware(NORGEN_FILTER,   2)
+    filter_plate  = protocol.load_labware(NORGEN_FILTER_ON_2ML,   2)
     wash_res      = load_source(protocol, 1, wash_total_ul)
 
     # ── Pipettes ──────────────────────────────────────────────────────────
     p300 = protocol.load_instrument('p300_single_gen2', 'left', tip_racks=[tips_300])
     p300.starting_tip = tips_300.wells()[TIP_START]
 
-    target_cols = filter_plate.columns()[start:stop]
+    # target_cols = filter_plate.columns()[start:stop]
+    target_cols = filter_plate.columns()[FILTER_COL_START:FILTER_COL_START + math.ceil(N_SAMPLES / 8)]
+    wash_src = make_source(wash_res, wash_total_ul)
 
     # ════════════════════════════════════════════════════════════════════
     # 3× WASH  (400 µL per well; 1 tip per wash, reused across all wells)
     # ════════════════════════════════════════════════════════════════════
     for wash_num in range(3):
         protocol.pause(
-            f"WASH {wash_num + 1}/3  ▶  Place filter plate at SLOT 2 "
+            f"WASH {wash_num + 1}/3  ▶  Place filter plate on a 2 mL deep-well collection plate at SLOT 2 "
             f"(after centrifugation). "
             f"Empty the SLOT 1 reagent source. "
             f"{source_prompt(1, wash_total_ul, 'Norgen wash buffer')} "
             "Resume when ready."
         )
 
-        wash_src = make_source(wash_res, wash_total_ul)
+        # wash_src = make_source(wash_res, wash_total_ul)
         wash_iters = math.ceil(WASH_VOL / 250)
         wash_per   = round(WASH_VOL / wash_iters, 1)
+        # p300.pick_up_tip()
+        # for col in target_cols:
+        #     for well in col:
+        #         for _ in range(wash_iters):
+        #             p300.aspirate(wash_per, wash_src.aspiration_location(wash_per))
+        #             p300.dispense(wash_per, well.top(-5))
+        # p300.drop_tip()
+
+        # only 4 samples in batch 1, so just do 4 wells in FILTER_COL_START instead of whole column
         p300.pick_up_tip()
-        for col in target_cols:
-            for well in col:
-                for _ in range(wash_iters):
-                    p300.aspirate(wash_per, wash_src.aspiration_location(wash_per))
-                    p300.dispense(wash_per, well.top(-5))
+        for i in range(N_SAMPLES):
+            well = target_cols[0][i]
+            for _ in range(wash_iters):
+                p300.aspirate(wash_per, wash_src.aspiration_location(wash_per))
+                p300.dispense(wash_per, well.top(-5))
         p300.drop_tip()
 
         if wash_num < 2:
             protocol.comment(
                 f"Centrifuge filter plate 2 min at maximum speed or 2,000 RPM, RT. "
-                "Discard flow-through."
+                "Discard flow-through from the 2 mL deep-well collection plate."
             )
         else:
             protocol.comment(
                 "Centrifuge filter plate 5 min at 2,000 RPM, RT. "
-                "Discard flow-through (dry spin)."
+                "Discard flow-through from the 2 mL deep-well collection plate (dry spin)."
             )
 
     protocol.comment(
         "Step 5 complete. "
-        "After dry spin, discard flow-through. "
-        "Proceed to Step 5b: replace the collection plate with a clean 2 mL deep-well elution plate."
+        "After dry spin, discard flow-through from the 2 mL deep-well collection plate. "
+        "Proceed to Step 5b: replace it with a clean 2 mL deep-well elution plate."
     )

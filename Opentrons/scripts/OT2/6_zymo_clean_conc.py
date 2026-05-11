@@ -48,9 +48,10 @@ except ImportError:
     ZYMO_FILTER='custom_zymo_96filterplate'    # simulation substitute
 
 # Pilot defaults; environment variables can still override these per run.
-N_SAMPLES=int(os.environ.get('N_SAMPLES','8'))
-FILTER_COL_START=int(os.environ.get('FILTER_COL_START','0'))
-TIP_START=int(os.environ.get('TIP_START','25'))       # after Steps 1-5b use 25 p300 tips
+N_SAMPLES=int(os.environ.get('N_SAMPLES','4'))
+FILTER_COL_START=int(os.environ.get('FILTER_COL_START','6'))  
+# TIP_START=int(os.environ.get('TIP_START','25'))       # after Steps 1-5b use 25 p300 tips
+TIP_START=int(os.environ.get('TIP_START','16'))       
 P20_TIP_START=int(os.environ.get('P20_TIP_START','1')) # after Step 5c uses 1 p20 tip
 WELL_START=int(os.environ.get('WELL_START','0'))       # unused by this column-wise script
 TUBE_BLOCK_2ML = globals().get('TUBE_BLOCK_2ML', 'opentrons_24_aluminumblock_nest_2ml_snapcap')
@@ -139,10 +140,20 @@ def source_prompt(slot, total_ul, label, force_reservoir=False):
 
 def run(protocol: protocol_api.ProtocolContext):
 
-    n_cols = max(1, math.ceil(N_SAMPLES / 8))
-    start  = FILTER_COL_START
-    stop   = start + n_cols
-    n_wells = n_cols * 8
+    # n_cols = max(1, math.ceil(N_SAMPLES / 8))
+    # start  = FILTER_COL_START
+    # stop   = start + n_cols
+    # n_wells = n_cols * 8
+    # bind_total_ul = reagent_ul(n_wells, BIND_VOL)
+    # etoh_total_ul = reagent_ul(n_wells, ETOH_VOL2)
+    # prep_total_ul = reagent_ul(n_wells, PREP_VOL)
+    # wash1_total_ul = reagent_ul(n_wells, WASH1_VOL)
+    # wash2_total_ul = reagent_ul(n_wells, WASH2_VOL)
+    # slot4_max_ul = max(bind_total_ul, etoh_total_ul, prep_total_ul, wash2_total_ul, FINAL_WATER_LOAD_UL)
+    # slot4_force_reservoir = slot4_max_ul >= SMALL_SOURCE_MAX_UL
+
+    # not always run through entire column, for only 4 samples in batch 1
+    n_wells = N_SAMPLES
     bind_total_ul = reagent_ul(n_wells, BIND_VOL)
     etoh_total_ul = reagent_ul(n_wells, ETOH_VOL2)
     prep_total_ul = reagent_ul(n_wells, PREP_VOL)
@@ -158,7 +169,7 @@ def run(protocol: protocol_api.ProtocolContext):
     sample_plate = protocol.load_labware(WELLPLATE_2ML,  3)
     filter_plate = protocol.load_labware(ZYMO_FILTER,    2)
     bind_res     = load_source(protocol, 4, slot4_max_ul, slot4_force_reservoir)
-    wash_res     = protocol.load_labware(RESERVOIR_1,    1)
+    # wash_res     = protocol.load_labware(RESERVOIR_1,    1)
 
     # ── Pipettes ──────────────────────────────────────────────────────────
     p300 = protocol.load_instrument('p300_single_gen2', 'left',  tip_racks=[tips_a, tips_b])
@@ -166,10 +177,13 @@ def run(protocol: protocol_api.ProtocolContext):
     p300.starting_tip = tips_a.wells()[TIP_START]
     p20.starting_tip = tips_20.wells()[P20_TIP_START]
 
-    wash_src  = wash_res.wells()[0]
+    # wash_src  = wash_res.wells()[0]
 
-    target_sample_cols = sample_plate.columns()[start:stop]
-    target_filter_cols = filter_plate.columns()[start:stop]
+    # target_sample_cols = sample_plate.columns()[start:stop]
+    # target_filter_cols = filter_plate.columns()[start:stop]
+
+    target_sample_cols = sample_plate.columns()[FILTER_COL_START:FILTER_COL_START + math.ceil(N_SAMPLES / 8)]
+    target_filter_cols = filter_plate.columns()[FILTER_COL_START:FILTER_COL_START + math.ceil(N_SAMPLES / 8)]
 
     # ════════════════════════════════════════════════════════════════════
     # 1. Binding buffer (226 µL/well; 1 tip reused)
@@ -182,13 +196,23 @@ def run(protocol: protocol_api.ProtocolContext):
     bind_src = make_source(bind_res, bind_total_ul, slot4_force_reservoir)
     iters    = math.ceil(BIND_VOL / 250)
     per_disp = round(BIND_VOL / iters, 1)
+    # p300.pick_up_tip()
+    # for col in target_sample_cols:
+    #     for well in col:
+    #         for _ in range(iters):
+    #             p300.aspirate(per_disp, bind_src.aspiration_location(per_disp))
+    #             p300.dispense(per_disp, well.bottom(15))
+    #             p300.blow_out(well.top(-2))
+    # p300.drop_tip()
+
+    # only 4 samples in batch 1, so just do 4 wells in FILTER_COL_START instead of whole column
     p300.pick_up_tip()
-    for col in target_sample_cols:
-        for well in col:
-            for _ in range(iters):
-                p300.aspirate(per_disp, bind_src.aspiration_location(per_disp))
-                p300.dispense(per_disp, well.bottom(15))
-                p300.blow_out(well.top(-2))
+    for i in range(N_SAMPLES):
+        well = target_sample_cols[0][i]
+        for _ in range(iters):
+            p300.aspirate(per_disp, bind_src.aspiration_location(per_disp))
+            p300.dispense(per_disp, well.bottom(15))
+            p300.blow_out(well.top(-2))
     p300.drop_tip()
 
     # ════════════════════════════════════════════════════════════════════
@@ -202,13 +226,23 @@ def run(protocol: protocol_api.ProtocolContext):
     etoh_src = make_source(bind_res, etoh_total_ul, slot4_force_reservoir)
     iters    = math.ceil(ETOH_VOL2 / 250)
     per_disp = round(ETOH_VOL2 / iters, 1)
+    # p300.pick_up_tip()
+    # for col in target_sample_cols:
+    #     for well in col:
+    #         for _ in range(iters):
+    #             p300.aspirate(per_disp, etoh_src.aspiration_location(per_disp))
+    #             p300.dispense(per_disp, well.bottom(25))
+    #             p300.blow_out(well.top(-2))
+    # p300.drop_tip()
+
+    # only 4 samples in batch 1, so just do 4 wells in FILTER_COL_START instead of whole column
     p300.pick_up_tip()
-    for col in target_sample_cols:
-        for well in col:
-            for _ in range(iters):
-                p300.aspirate(per_disp, etoh_src.aspiration_location(per_disp))
-                p300.dispense(per_disp, well.bottom(25))
-                p300.blow_out(well.top(-2))
+    for i in range(N_SAMPLES):
+        well = target_sample_cols[0][i]
+        for _ in range(iters):
+            p300.aspirate(per_disp, etoh_src.aspiration_location(per_disp))
+            p300.dispense(per_disp, well.bottom(25))
+            p300.blow_out(well.top(-2))
     p300.drop_tip()
 
     # ════════════════════════════════════════════════════════════════════
@@ -220,16 +254,29 @@ def run(protocol: protocol_api.ProtocolContext):
         "Place Zymo filter plate (on collection plate) at SLOT 2. Resume."
     )
 
-    for src_col, dst_col in zip(target_sample_cols, target_filter_cols):
-        for src_well, dst_well in zip(src_col, dst_col):
-            p300.pick_up_tip()
-            for _ in range(ZYMO_LOAD_REPS):   # 3 × 226 µL = 678 µL
-                p300.aspirate(ZYMO_LOAD_VOL, src_well.bottom(0.3))
-                protocol.delay(seconds=0.5)
-                p300.air_gap(20)
-                p300.dispense(ZYMO_LOAD_VOL + 20, dst_well.top(-5))
-                p300.blow_out(dst_well.top(-5))
-            p300.drop_tip()
+    # for src_col, dst_col in zip(target_sample_cols, target_filter_cols):
+    #     for src_well, dst_well in zip(src_col, dst_col):
+    #         p300.pick_up_tip()
+    #         for _ in range(ZYMO_LOAD_REPS):   # 3 × 226 µL = 678 µL
+    #             p300.aspirate(ZYMO_LOAD_VOL, src_well.bottom(0.3))
+    #             protocol.delay(seconds=0.5)
+    #             p300.air_gap(20)
+    #             p300.dispense(ZYMO_LOAD_VOL + 20, dst_well.top(-5))
+    #             p300.blow_out(dst_well.top(-5))
+    #         p300.drop_tip()
+
+    # only 4 samples in batch 1, so just do 4 wells in FILTER_COL_START instead of whole column
+    for i in range(N_SAMPLES):
+        src_well = target_sample_cols[0][i]
+        dst_well = target_filter_cols[0][i]
+        p300.pick_up_tip()
+        for _ in range(ZYMO_LOAD_REPS):   # 3 × 226 µL = 678 µL
+            p300.aspirate(ZYMO_LOAD_VOL, src_well.bottom(0.3))
+            protocol.delay(seconds=0.5)
+            p300.air_gap(20)
+            p300.dispense(ZYMO_LOAD_VOL + 20, dst_well.top(-5))
+            p300.blow_out(dst_well.top(-5))
+        p300.drop_tip()
 
     protocol.comment(
         "Centrifuge filter plate 5 min at 3,000–5,000 g, RT. "
@@ -248,13 +295,23 @@ def run(protocol: protocol_api.ProtocolContext):
     prep_src = make_source(bind_res, prep_total_ul, slot4_force_reservoir)
     iters    = math.ceil(PREP_VOL / 250)
     per_disp = round(PREP_VOL / iters, 1)
+    # p300.pick_up_tip()
+    # for col in target_filter_cols:
+    #     for well in col:
+    #         for _ in range(iters):
+    #             p300.aspirate(per_disp, prep_src.aspiration_location(per_disp))
+    #             p300.dispense(per_disp, well.bottom(22))
+    #             p300.blow_out(well.top(-2))
+    # p300.drop_tip()
+
+    # only 4 samples in batch 1, so just do 4 wells in FILTER_COL_START instead of whole column
     p300.pick_up_tip()
-    for col in target_filter_cols:
-        for well in col:
-            for _ in range(iters):
-                p300.aspirate(per_disp, prep_src.aspiration_location(per_disp))
-                p300.dispense(per_disp, well.bottom(22))
-                p300.blow_out(well.top(-2))
+    for i in range(N_SAMPLES):
+        well = target_filter_cols[0][i]
+        for _ in range(iters):
+            p300.aspirate(per_disp, prep_src.aspiration_location(per_disp))
+            p300.dispense(per_disp, well.bottom(22))
+            p300.blow_out(well.top(-2))
     p300.drop_tip()
     protocol.comment(
         "Centrifuge 5 min at 3,000–5,000 g. Discard flow-through."
@@ -263,21 +320,45 @@ def run(protocol: protocol_api.ProtocolContext):
     # ════════════════════════════════════════════════════════════════════
     # 5. Wash buffer – round 1 (700 µL/well; 1 tip reused)
     # ════════════════════════════════════════════════════════════════════
+    # protocol.pause(
+    #     "STEP 6E  ▶  Place filter plate at SLOT 2. "
+    #     f"Replace the SLOT 1 reservoir with a 195 mL single-channel reservoir containing "
+    #     f"{wash1_total_ul / 1000:.1f} mL wash buffer. "
+    #     "Resume."
+    # )
+
+    # protocol.pause(
+    #     "STEP 6E  ▶  Place filter plate at SLOT 2. "
+    #     f"Empty the SLOT 1 reagent source. "
+    #     f"{source_prompt(1, wash1_total_ul, 'wash buffer', False)} "
+    #     "Resume."
+    # )
     protocol.pause(
         "STEP 6E  ▶  Place filter plate at SLOT 2. "
-        f"Replace the SLOT 1 reservoir with a 195 mL single-channel reservoir containing "
-        f"{wash1_total_ul / 1000:.1f} mL wash buffer. "
+        f"Empty the SLOT 4 reagent source. "
+        f"{source_prompt(4, wash1_total_ul, 'wash buffer', slot4_force_reservoir)} "
         "Resume."
     )
+    wash1_src = make_source(bind_res, wash1_total_ul, slot4_force_reservoir)
     iters    = math.ceil(WASH1_VOL / 250)
     per_disp = round(WASH1_VOL / iters, 1)
+    # p300.pick_up_tip()
+    # for col in target_filter_cols:
+    #     for well in col:
+    #         for _ in range(iters):
+    #             p300.aspirate(per_disp, wash_src.bottom(2))
+    #             p300.dispense(per_disp, well.bottom(22))
+    #             p300.blow_out(well.top(-2))
+    # p300.drop_tip()
+
+    # only 4 samples in batch 1, so just do 4 wells in FILTER_COL_START instead of whole column
     p300.pick_up_tip()
-    for col in target_filter_cols:
-        for well in col:
-            for _ in range(iters):
-                p300.aspirate(per_disp, wash_src.bottom(2))
-                p300.dispense(per_disp, well.bottom(22))
-                p300.blow_out(well.top(-2))
+    for i in range(N_SAMPLES):
+        well = target_filter_cols[0][i]
+        for _ in range(iters):
+            p300.aspirate(per_disp, wash1_src.aspiration_location(per_disp))
+            p300.dispense(per_disp, well.bottom(22))
+            p300.blow_out(well.top(-2))
     p300.drop_tip()
     protocol.comment(
         "Centrifuge 5 min at 3,000–5,000 g. Discard flow-through. "
@@ -296,13 +377,23 @@ def run(protocol: protocol_api.ProtocolContext):
     wash2_src = make_source(bind_res, wash2_total_ul, slot4_force_reservoir)
     iters    = math.ceil(WASH2_VOL / 250)
     per_disp = round(WASH2_VOL / iters, 1)
+    # p300.pick_up_tip()
+    # for col in target_filter_cols:
+    #     for well in col:
+    #         for _ in range(iters):
+    #             p300.aspirate(per_disp, wash2_src.aspiration_location(per_disp))
+    #             p300.dispense(per_disp, well.bottom(22))
+    #             p300.blow_out(well.top(-2))
+    # p300.drop_tip()
+
+    # only 4 samples in batch 1, so just do 4 wells in FILTER_COL_START instead of whole column
     p300.pick_up_tip()
-    for col in target_filter_cols:
-        for well in col:
-            for _ in range(iters):
-                p300.aspirate(per_disp, wash2_src.aspiration_location(per_disp))
-                p300.dispense(per_disp, well.bottom(22))
-                p300.blow_out(well.top(-2))
+    for i in range(N_SAMPLES):
+        well = target_filter_cols[0][i]
+        for _ in range(iters):
+            p300.aspirate(per_disp, wash2_src.aspiration_location(per_disp))
+            p300.dispense(per_disp, well.bottom(22))
+            p300.blow_out(well.top(-2))
     p300.drop_tip()
     protocol.comment(
         "Centrifuge 5 min at 3,000–5,000 g. Discard flow-through AND collection plate. "
@@ -320,13 +411,23 @@ def run(protocol: protocol_api.ProtocolContext):
         "Resume."
     )
 
+    # elu_src = make_source(bind_res, FINAL_WATER_LOAD_UL, slot4_force_reservoir)
+    # p20.pick_up_tip()
+    # for col in target_filter_cols:
+    #     for well in col:
+    #         p20.aspirate(15, elu_src.aspiration_location(15))
+    #         p20.dispense(17, well.bottom(5))
+    #         p20.blow_out(well.bottom(6))
+    # p20.drop_tip()
+
+    # only 4 samples in batch 1, so just do 4 wells in FILTER_COL_START instead of whole column
     elu_src = make_source(bind_res, FINAL_WATER_LOAD_UL, slot4_force_reservoir)
     p20.pick_up_tip()
-    for col in target_filter_cols:
-        for well in col:
-            p20.aspirate(15, elu_src.aspiration_location(15))
-            p20.dispense(17, well.bottom(5))
-            p20.blow_out(well.bottom(6))
+    for i in range(N_SAMPLES):
+        well = target_filter_cols[0][i]
+        p20.aspirate(15, elu_src.aspiration_location(15))
+        p20.dispense(17, well.bottom(5))
+        p20.blow_out(well.bottom(6))
     p20.drop_tip()
 
     protocol.comment(
