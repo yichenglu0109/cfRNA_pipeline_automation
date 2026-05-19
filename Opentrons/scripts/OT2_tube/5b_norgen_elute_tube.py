@@ -11,7 +11,7 @@ except ImportError:
 
     API_LEVEL = "2.13"
     N_SAMPLES = int(os.environ.get("N_SAMPLES", "4"))
-    TIP_START = int(os.environ.get("TIP_START", "0"))
+    TIP_START = int(os.environ.get("TIP_START", "14"))
     P20_TIP_START = int(os.environ.get("P20_TIP_START", "0"))
 
     LYSIS_VOL = float(os.environ.get("LYSIS_VOL", "1800"))
@@ -40,20 +40,20 @@ except ImportError:
     TIPS_20 = "opentrons_96_tiprack_20ul"
     TUBE_BLOCK_2ML = "opentrons_24_aluminumblock_nest_2ml_snapcap"
     RESERVOIR_1 = "nest_1_reservoir_195ml"
-    SAMPLE_TUBE_RACK = os.environ.get("SAMPLE_TUBE_RACK", "custom_4way_8x15ml_tuberack")
+    SAMPLE_TUBE_RACK = os.environ.get("SAMPLE_TUBE_RACK", "3dprinted_15_tuberack_15000ul")
 
     USE_CUSTOM_15ML_RACK = os.environ.get("USE_CUSTOM_15ML_RACK", "0") == "1"
-    CUSTOM_15ML_RACK_LOAD_NAME = os.environ.get("CUSTOM_15ML_RACK_LOAD_NAME", "custom_flexible_15ml_conical_rack")
-    CUSTOM_15ML_RACK_X0 = float(os.environ.get("CUSTOM_15ML_RACK_X0", "27.9"))
-    CUSTOM_15ML_RACK_Y0 = float(os.environ.get("CUSTOM_15ML_RACK_Y0", "40.2"))
-    CUSTOM_15ML_RACK_X_SPACING = float(os.environ.get("CUSTOM_15ML_RACK_X_SPACING", "24.0"))
-    CUSTOM_15ML_RACK_Y_SPACING = float(os.environ.get("CUSTOM_15ML_RACK_Y_SPACING", "25.0"))
-    CUSTOM_15ML_RACK_WELL_Z = float(os.environ.get("CUSTOM_15ML_RACK_WELL_Z", "0.0"))
-    CUSTOM_15ML_RACK_DIAMETER = float(os.environ.get("CUSTOM_15ML_RACK_DIAMETER", "17.5"))
-    CUSTOM_15ML_RACK_DEPTH = float(os.environ.get("CUSTOM_15ML_RACK_DEPTH", "115.0"))
-    CUSTOM_15ML_RACK_TOTAL_X = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_X", "127.8"))
-    CUSTOM_15ML_RACK_TOTAL_Y = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_Y", "85.5"))
-    CUSTOM_15ML_RACK_TOTAL_Z = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_Z", "120.0"))
+    CUSTOM_15ML_RACK_LOAD_NAME = os.environ.get("CUSTOM_15ML_RACK_LOAD_NAME", "3dprinted_15_tuberack_15000ul")
+    CUSTOM_15ML_RACK_X0 = float(os.environ.get("CUSTOM_15ML_RACK_X0", "13.88"))
+    CUSTOM_15ML_RACK_Y0 = float(os.environ.get("CUSTOM_15ML_RACK_Y0", "69.24"))
+    CUSTOM_15ML_RACK_X_SPACING = float(os.environ.get("CUSTOM_15ML_RACK_X_SPACING", "25.0"))
+    CUSTOM_15ML_RACK_Y_SPACING = float(os.environ.get("CUSTOM_15ML_RACK_Y_SPACING", "-25.0"))
+    CUSTOM_15ML_RACK_WELL_Z = float(os.environ.get("CUSTOM_15ML_RACK_WELL_Z", "8.0"))
+    CUSTOM_15ML_RACK_DIAMETER = float(os.environ.get("CUSTOM_15ML_RACK_DIAMETER", "14.9"))
+    CUSTOM_15ML_RACK_DEPTH = float(os.environ.get("CUSTOM_15ML_RACK_DEPTH", "117.5"))
+    CUSTOM_15ML_RACK_TOTAL_X = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_X", "127.76"))
+    CUSTOM_15ML_RACK_TOTAL_Y = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_Y", "85.48"))
+    CUSTOM_15ML_RACK_TOTAL_Z = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_Z", "125.5"))
 
     SLOT_REAGENT_A = 5
     SLOT_SAMPLE_TUBES = 2
@@ -64,8 +64,8 @@ except ImportError:
     SLOT_TIPS_300_A = 8
     SLOT_TIPS_300_B = 9
 
-    SAMPLE_TUBES = os.environ.get("SAMPLE_TUBES", "A1,B1,A2,B2").split(",")
-    TRASH_TUBES = os.environ.get("TRASH_TUBES", "A3,B3,A4,B4").split(",")
+    SAMPLE_TUBES = os.environ.get("SAMPLE_TUBES", "A1,A2,A3,A4").split(",")
+    TRASH_TUBES = os.environ.get("TRASH_TUBES", "C1,C2,C3,C4").split(",")
     ELUATE_TUBES = ["A1", "B1", "C1", "D1"]
     ZYMO_INPUT_TUBES = ELUATE_TUBES
     NORGEN_COLUMN_TUBES = ["A1", "B1", "C1", "D1"]
@@ -78,7 +78,7 @@ except ImportError:
     ZYMO_WATER_TUBE = "B5"
     NORG_ELU_TUBE = "C5"
 
-    SAMPLE_ASPIRATE_H = float(os.environ.get("SAMPLE_ASPIRATE_H", "2.0"))
+    SAMPLE_ASPIRATE_H = float(os.environ.get("SAMPLE_ASPIRATE_H", "1.0"))
     SAMPLE_MIX_LOW_H = float(os.environ.get("SAMPLE_MIX_LOW_H", "2.0"))
     SAMPLE_MIX_HIGH_H = float(os.environ.get("SAMPLE_MIX_HIGH_H", "12.0"))
     SAMPLE_DISPENSE_H = float(os.environ.get("SAMPLE_DISPENSE_H", "25.0"))
@@ -88,16 +88,17 @@ except ImportError:
     SLURRY_TUBE_ASPIRATE_H = float(os.environ.get("SLURRY_TUBE_ASPIRATE_H", "2.0"))
     DNASE_DISPENSE_H = float(os.environ.get("DNASE_DISPENSE_H", "5.0"))
     DNASE_BLOWOUT_H = float(os.environ.get("DNASE_BLOWOUT_H", "8.0"))
-    NORGEN_COLUMN_DISPENSE_FROM_TOP = float(os.environ.get("NORGEN_COLUMN_DISPENSE_FROM_TOP", "5.0"))
-    NORGEN_COLUMN_BLOWOUT_FROM_TOP = float(os.environ.get("NORGEN_COLUMN_BLOWOUT_FROM_TOP", "5.0"))
-    NORGEN_ELUTE_FROM_BOTTOM = float(os.environ.get("NORGEN_ELUTE_FROM_BOTTOM", "5.0"))
-    NORGEN_ELUTE_BLOWOUT_FROM_BOTTOM = float(os.environ.get("NORGEN_ELUTE_BLOWOUT_FROM_BOTTOM", "6.0"))
+    SHARED_BLOCK_SAFE_TRAVEL_FROM_TOP = float(os.environ.get("SHARED_BLOCK_SAFE_TRAVEL_FROM_TOP", "25.0"))
+    NORGEN_COLUMN_DISPENSE_FROM_TOP = float(os.environ.get("NORGEN_COLUMN_DISPENSE_FROM_TOP", "-3.0"))
+    NORGEN_COLUMN_BLOWOUT_FROM_TOP = float(os.environ.get("NORGEN_COLUMN_BLOWOUT_FROM_TOP", "0.0"))
+    NORGEN_ELUTE_FROM_TOP = float(os.environ.get("NORGEN_ELUTE_FROM_TOP", "-12.0"))
+    NORGEN_ELUTE_BLOWOUT_FROM_TOP = float(os.environ.get("NORGEN_ELUTE_BLOWOUT_FROM_TOP", "-8.0"))
     ZYMO_COLUMN_DISPENSE_FROM_TOP = float(os.environ.get("ZYMO_COLUMN_DISPENSE_FROM_TOP", "5.0"))
     ZYMO_COLUMN_BLOWOUT_FROM_TOP = float(os.environ.get("ZYMO_COLUMN_BLOWOUT_FROM_TOP", "5.0"))
     ZYMO_ELUTE_FROM_BOTTOM = float(os.environ.get("ZYMO_ELUTE_FROM_BOTTOM", "5.0"))
     ZYMO_ELUTE_BLOWOUT_FROM_BOTTOM = float(os.environ.get("ZYMO_ELUTE_BLOWOUT_FROM_BOTTOM", "6.0"))
 
-    DECANT_HEIGHTS = [37, 34, 30, 26, 22, 18, 14, 10, 8, 6, 5, 4]
+    DECANT_HEIGHTS = [45, 41, 37, 33, 29, 25, 21, 17, 13, 11, 9, 7.5]
     DECANT_VOL = 250
     DECANT_REPS = 2
 
@@ -116,8 +117,8 @@ except ImportError:
         return [by_name[name] for name in names]
 
     def custom_15ml_rack_definition():
-        rows = ["A", "B"]
-        cols = ["1", "2", "3", "4"]
+        rows = ["A", "B", "C"]
+        cols = ["1", "2", "3", "4", "5"]
         wells = {}
         ordering = []
         for col_index, col in enumerate(cols):
@@ -139,7 +140,7 @@ except ImportError:
             "ordering": ordering,
             "wells": wells,
             "groups": [{"metadata": {"wellBottomShape": "v"}, "wells": [name for col in ordering for name in col]}],
-            "metadata": {"displayName": "Flexible 15 mL conical tube rack", "displayCategory": "tubeRack", "displayVolumeUnits": "uL"},
+            "metadata": {"displayName": "3D-printed 15 mL tube rack", "displayCategory": "tubeRack", "displayVolumeUnits": "uL"},
             "parameters": {"format": "irregular", "isTiprack": False, "loadName": CUSTOM_15ML_RACK_LOAD_NAME},
             "namespace": "custom_beta",
             "version": 1,
@@ -211,6 +212,10 @@ metadata = {
 }
 
 
+def safe_travel(pipette, well):
+    pipette.move_to(well.top(SHARED_BLOCK_SAFE_TRAVEL_FROM_TOP))
+
+
 def run(protocol: protocol_api.ProtocolContext):
     n = sample_count()
     elu_total = total_with_excess(NORGEN_ELU_VOL)
@@ -224,17 +229,20 @@ def run(protocol: protocol_api.ProtocolContext):
     targets = norgen_column_wells(shared)
 
     protocol.pause(
-        f"STEP 5b: Place dry-spun Norgen columns on clean 2 mL elution tubes "
+        f"STEP 5b: Place dry-spun Norgen columns on clean 1.5 mL elution tubes "
         f"in SLOT {SLOT_SHARED_2ML} positions {', '.join(NORGEN_COLUMN_TUBES[:n])}. "
         f"Add {format_ul(elu_total)} Norgen elution buffer to tube {NORG_ELU_TUBE}. Resume."
     )
 
-    elu_src = make_single_source(reagent_well(shared, NORG_ELU_TUBE), elu_total)
+    elu_well = reagent_well(shared, NORG_ELU_TUBE)
+    elu_src = make_single_source(elu_well, elu_total)
     p300.pick_up_tip()
     for column in targets:
         p300.aspirate(NORGEN_ELU_VOL, elu_src.aspiration_location(NORGEN_ELU_VOL))
-        p300.dispense(NORGEN_ELU_VOL, column.bottom(NORGEN_ELUTE_FROM_BOTTOM))
-        p300.blow_out(column.bottom(NORGEN_ELUTE_BLOWOUT_FROM_BOTTOM))
+        safe_travel(p300, elu_well)
+        p300.dispense(NORGEN_ELU_VOL, column.top(NORGEN_ELUTE_FROM_TOP))
+        p300.blow_out(column.top(NORGEN_ELUTE_BLOWOUT_FROM_TOP))
+        safe_travel(p300, column)
     p300.drop_tip()
 
     protocol.comment(

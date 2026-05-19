@@ -1,0 +1,91 @@
+<!doctype html><html><head><meta charset="utf-8"><title>OT2 Tube Pilot 4 Samples</title><style>
+@page { margin: 0.45in; }
+body { font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif; font-size: 9.4pt; line-height: 1.22; color: #111; }
+h1 { font-size: 18pt; margin: 0 0 8pt; }
+h2 { font-size: 12.8pt; margin: 10pt 0 4pt; border-bottom: 1px solid #ddd; padding-bottom: 2pt; }
+h3 { font-size: 10.8pt; margin: 8pt 0 3pt; }
+h4 { font-size: 9.8pt; margin: 6pt 0 2pt; }
+p { margin: 0 0 4pt; }
+ul, ol { margin: 0 0 5pt 17pt; padding: 0; }
+li { margin: 1pt 0; }
+table { border-collapse: collapse; width: 100%; margin: 5pt 0 6pt; page-break-inside: auto; }
+th, td { border: 1px solid #bbb; padding: 2.5pt 3pt; vertical-align: top; }
+th { background: #eee; font-weight: 700; }
+code { font-family: Menlo, Consolas, monospace; font-size: 8.2pt; background: #f4f4f4; padding: 0 1pt; }
+pre { background: #f4f4f4; padding: 5pt; overflow-wrap: break-word; white-space: pre-wrap; }
+strong { font-weight: 800; }
+</style></head><body><h1>Pilot Experiment: 15 mL Tube OT-2 cfRNA Extraction, 4 Samples</h1>
+<p>Author: Peter Lu</p>
+<p>Date: 2026-05-16</p>
+<p>This pilot run uses the tube-based OT-2 workflow only. There is no matched manual arm in this run. The goal is to validate the 15 mL tube workflow, column handling, transfer heights, and final eluate recovery on four inputs:</p>
+<ol>
+<li>Plasma sample 1</li>
+<li>Plasma sample 2</li>
+<li>Water negative extraction control</li>
+<li>Positive control mouse tissue extract</li>
+</ol>
+<h2>Objective</h2>
+<p>Evaluate whether the current tube-based OT-2 protocol can complete the full Norgen extraction, DNase digestion, and Zymo cleanup workflow without transfer failure, column placement failure, or obvious sample loss.</p>
+<p>Primary questions:</p>
+<ol>
+<li>Do all four 15 mL tube positions align reliably in the 3D-printed rack?</li>
+<li>Does Step 3 decant remove supernatant while preserving pellet/slurry material?</li>
+<li>Does Step 4 transfer the mixed slurry into Norgen columns without major residual liquid?</li>
+<li>Do Norgen and Zymo column dispense/elution heights deliver liquid into the column opening?</li>
+<li>Is the final Zymo eluate volume close to the expected 15 uL per sample?</li>
+</ol>
+<h2>Sample Map</h2>
+<p>Preserve this order through all 15 mL tubes, Norgen columns, Norgen eluates, DNase digestion, Zymo columns, and final eluates.</p>
+<table><thead><tr><th>Sample index</th><th>15 mL tube</th><th>Waste tube</th><th>Shared rack Norgen / eluate</th><th>Shared rack Zymo column</th><th>Sample type</th><th>Sample ID</th></tr></thead><tbody><tr><td>1</td><td>A1</td><td>C1</td><td>A1</td><td>A2</td><td>Plasma</td><td>Plasma-1</td></tr><tr><td>2</td><td>A2</td><td>C2</td><td>B1</td><td>B2</td><td>Plasma</td><td>Plasma-2</td></tr><tr><td>3</td><td>A3</td><td>C3</td><td>C1</td><td>C2</td><td>Water negative control</td><td>Water-NTC</td></tr><tr><td>4</td><td>A4</td><td>C4</td><td>D1</td><td>D2</td><td>Positive control</td><td>Mouse-tissue-extract-PC</td></tr></tbody></table>
+<p>Default environment mapping:</p>
+<pre><code>N_SAMPLES=4
+SAMPLE_TUBES=A1,A2,A3,A4
+TRASH_TUBES=C1,C2,C3,C4</code></pre>
+<h2>Required Setup</h2>
+<p>Use the operating protocol in <code>extraction_OT2_protocol_15mL_tube.md</code>.</p>
+<p>Custom labware required:</p>
+<ul>
+<li><code>labware/3dprinted_15_tuberack_15000ul.json</code></li>
+</ul>
+<p>Hardware:</p>
+<ul>
+<li><code>p300_single_gen2</code> on left mount</li>
+<li><code>p20_single_gen2</code> on right mount</li>
+<li>3D-printed 15 mL tube rack in slot 2</li>
+<li><code>opentrons_24_aluminumblock_nest_2ml_snapcap</code> in slot 4</li>
+<li>p20 tip rack in slot 7</li>
+<li>p300 tip rack in slot 8, with slot 9 available when needed</li>
+</ul>
+<h2>Current Height Settings</h2>
+<p>These settings reflect the current tube scripts. Step 1, Step 3 and Step 4 currently have 2-sample standalone fallbacks for the active water-test path; Steps 5-6 remain set up for A1-D1 / A2-D2.</p>
+<table><thead><tr><th>Operation</th><th>Setting</th></tr></thead><tbody><tr><td>Step 1 slurry/lysis dispense into 15 mL tubes</td><td><code>SAMPLE_TOP_DISPENSE_OFFSET=5.0</code>, so blowout at <code>tube.top(5)</code></td></tr><tr><td>Step 3 EtOH/re-lysis/wash dispense into 15 mL tubes</td><td><code>SAMPLE_TOP_DISPENSE_OFFSET=-10.0</code>, so additions use <code>tube.top(-10)</code></td></tr><tr><td>Step 3 decant waste dispense</td><td><code>TRASH_DISPENSE_H=50.0</code></td></tr><tr><td>Step 3 staged decant</td><td><code>DECANT_HEIGHTS=45,41,37,33,29,25,21,17,13,11,8.5,6.5</code></td></tr><tr><td>Step 4 15 mL sample aspirate for Norgen transfer</td><td><code>SAMPLE_ASPIRATE_H=0.5</code></td></tr><tr><td>Reagent tube aspiration</td><td><code>REAGENT_TUBE_ASPIRATE_H=1.0</code></td></tr><tr><td>DNase-treated eluate aspiration into Zymo</td><td><code>ZYMO_INPUT_ASPIRATE_H=2.0</code></td></tr><tr><td>DNase dispense / blowout</td><td><code>DNASE_DISPENSE_H=5.0</code>, <code>DNASE_BLOWOUT_H=8.0</code></td></tr><tr><td>Step 5/5b/6 shared 24-block safe travel after low tube/column moves</td><td><code>SHARED_BLOCK_SAFE_TRAVEL_FROM_TOP=25.0</code></td></tr><tr><td>Norgen column load/wash dispense / blowout</td><td><code>NORGEN_COLUMN_DISPENSE_FROM_TOP=-3.0</code>, <code>NORGEN_COLUMN_BLOWOUT_FROM_TOP=0.0</code></td></tr><tr><td>Norgen elution / blowout</td><td><code>NORGEN_ELUTE_FROM_TOP=-12.0</code>, <code>NORGEN_ELUTE_BLOWOUT_FROM_TOP=-8.0</code></td></tr><tr><td>Step 6 binding/EtOH dispense into DNase-treated eluate tubes</td><td><code>SAMPLE_DISPENSE_H=30.0</code></td></tr><tr><td>Zymo column load/wash dispense / blowout</td><td><code>ZYMO_COLUMN_DISPENSE_FROM_TOP=0.0</code>, <code>ZYMO_COLUMN_BLOWOUT_FROM_TOP=0.0</code></td></tr><tr><td>Zymo final elution / blowout</td><td><code>ZYMO_ELUTE_FROM_TOP=-12.0</code>, <code>ZYMO_ELUTE_BLOWOUT_FROM_TOP=-8.0</code></td></tr></tbody></table>
+<h2>OT-2 Run Settings</h2>
+<p>Tip starts assume one continuous p300 tip sequence across extraction and one p20 sequence for DNase and final elution.</p>
+<table><thead><tr><th>Step</th><th>Script</th><th>N_SAMPLES</th><th>TIP_START</th><th>P20_TIP_START</th><th>Notes</th></tr></thead><tbody><tr><td>1</td><td><code>1_add_slurry_lysis_tube.py</code></td><td>2</td><td>49</td><td>N/A</td><td>Current active standalone fallback: A1,A2</td></tr><tr><td>3</td><td><code>3_etoh_centrifuge_tube.py</code></td><td>2</td><td>50</td><td>N/A</td><td>Current active standalone fallback: A1,A2 to C1,C2 waste</td></tr><tr><td>4</td><td><code>4_transfer_to_norgen_column_tube.py</code></td><td>2</td><td>54</td><td>N/A</td><td>Current active standalone fallback: A1,A2 to A1,B1 Norgen columns</td></tr><tr><td>5</td><td><code>5_norgen_wash_tube.py</code></td><td>4</td><td>32</td><td>N/A</td><td>Norgen wash and dry spin</td></tr><tr><td>5b</td><td><code>5b_norgen_elute_tube.py</code></td><td>4</td><td>33</td><td>N/A</td><td>Norgen elution</td></tr><tr><td>5c</td><td><code>5c_dnase_digestion_tube.py</code></td><td>4</td><td>N/A</td><td>0</td><td>DNase addition</td></tr><tr><td>6</td><td><code>6_zymo_clean_conc_tube.py</code></td><td>4</td><td>40</td><td>0</td><td>Zymo cleanup and final elution</td></tr></tbody></table>
+<p>Example commands:</p>
+<pre><code>N_SAMPLES=2 SAMPLE_TUBES=A1,A2 TRASH_TUBES=C1,C2 TIP_START=49 opentrons_execute 1_add_slurry_lysis_tube.py
+N_SAMPLES=2 SAMPLE_TUBES=A1,A2 TRASH_TUBES=C1,C2 TIP_START=50 opentrons_execute 3_etoh_centrifuge_tube.py
+N_SAMPLES=2 SAMPLE_TUBES=A1,A2 TIP_START=54 opentrons_execute 4_transfer_to_norgen_column_tube.py
+N_SAMPLES=4 TIP_START=32 opentrons_execute 5_norgen_wash_tube.py
+N_SAMPLES=4 TIP_START=33 opentrons_execute 5b_norgen_elute_tube.py
+N_SAMPLES=4 P20_TIP_START=0 opentrons_execute 5c_dnase_digestion_tube.py
+N_SAMPLES=4 TIP_START=40 P20_TIP_START=0 opentrons_execute 6_zymo_clean_conc_tube.py</code></pre>
+<p>Do not put spaces in comma-separated tube lists. Use <code>SAMPLE_TUBES=A1,A2</code>, not <code>SAMPLE_TUBES=A1, A2</code>.</p>
+<h2>Workflow</h2>
+<ol>
+<li>Upload or confirm <code>3dprinted_15_tuberack_15000ul</code> in the Opentrons App.</li>
+<li>Confirm deck calibration and labware offsets for the slot 2 rack and slot 4 aluminum block.</li>
+<li>Run the 15 mL tube position check if the rack or deck offset changed.</li>
+<li>Label 15 mL tubes A1-A4 and waste tubes C1-C4.</li>
+<li>Add slurry and lysis buffer with Step 1.</li>
+<li>Add the two plasma samples, water control, and positive control to A1-A4 in the sample map order.</li>
+<li>Incubate at 60 C for 10 min.</li>
+<li>Run Steps 3, 4, 5, 5b, 5c, and 6 using the commands above.</li>
+<li>Keep eluates in A1-D1 order after Norgen and in final sample order after Zymo.</li>
+</ol>
+<h2>Run Checklist</h2>
+<table><thead><tr><th>Workflow step</th><th>Completed</th><th>Notes</th></tr></thead><tbody><tr><td>Sample map and tube labels confirmed</td><td>[ ]</td><td></td></tr><tr><td>3D-printed 15 mL rack JSON uploaded and offset calibrated</td><td>[ ]</td><td></td></tr><tr><td>Step 1 slurry and lysis added</td><td>[ ]</td><td></td></tr><tr><td>Samples and controls added in A1-A4 order</td><td>[ ]</td><td></td></tr><tr><td>60 C incubation complete</td><td>[ ]</td><td></td></tr><tr><td>Step 3 EtOH addition, decant, re-lysis, and EtOH wash complete</td><td>[ ]</td><td></td></tr><tr><td>Step 4 Norgen transfer complete</td><td>[ ]</td><td></td></tr><tr><td>Step 5 Norgen washes and dry spin complete</td><td>[ ]</td><td></td></tr><tr><td>Step 5b Norgen elution complete</td><td>[ ]</td><td></td></tr><tr><td>Step 5c DNase digestion complete</td><td>[ ]</td><td></td></tr><tr><td>Step 6 Zymo cleanup and final elution complete</td><td>[ ]</td><td></td></tr><tr><td>Final eluate volume recorded</td><td>[ ]</td><td></td></tr></tbody></table>
+<h2>Data to Record</h2>
+<table><thead><tr><th>Field</th><th>Plasma-1</th><th>Plasma-2</th><th>Water-NTC</th><th>Mouse-tissue-extract-PC</th></tr></thead><tbody><tr><td>Input volume</td><td></td><td></td><td></td><td></td></tr><tr><td>Step 3 pellet/slurry observation</td><td></td><td></td><td></td><td></td></tr><tr><td>Step 3 residual liquid after decant</td><td></td><td></td><td></td><td></td></tr><tr><td>Step 4 residual liquid after transfer</td><td></td><td></td><td></td><td></td></tr><tr><td>Norgen flow-through/clogging</td><td></td><td></td><td></td><td></td></tr><tr><td>Norgen eluate volume observed</td><td></td><td></td><td></td><td></td></tr><tr><td>Zymo flow-through/clogging</td><td></td><td></td><td></td><td></td></tr><tr><td>Final Zymo eluate volume</td><td></td><td></td><td></td><td></td></tr><tr><td>Bioanalyzer / downstream QC result</td><td></td><td></td><td></td><td></td></tr><tr><td>Operational notes</td><td></td><td></td><td></td><td></td></tr></tbody></table>
+<h2>Acceptance Notes</h2>
+<p>This pilot is primarily a workflow and height validation run. Treat a successful run as one where all four samples complete the full workflow, liquid enters the intended tubes/columns at every dispense, and final eluate is recovered for all four samples.</p></body></html>

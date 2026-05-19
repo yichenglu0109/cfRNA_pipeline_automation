@@ -1,7 +1,7 @@
 """
-OT-2 tube pilot test: safe custom 4-way 8-position 15 mL rack position test.
+OT-2 tube pilot test: safe 3D-printed 15 mL tube rack position test.
 
-Upload labware/custom_4way_8x15ml_tuberack.json in the Opentrons App before
+Upload labware/3dprinted_15_tuberack_15000ul.json in the Opentrons App before
 uploading this protocol.
 """
 
@@ -9,20 +9,20 @@ from opentrons import protocol_api
 
 
 metadata = {
-    "protocolName": "cfRNA tube pilot test - safe 4-way 15 mL rack position hover",
+    "protocolName": "cfRNA tube pilot test - safe 3D-printed 15 mL tube rack position hover",
     "author": "Peter Lu",
     "apiLevel": "2.13",
 }
 
 
-CUSTOM_RACK = "custom_4way_8x15ml_tuberack"
+CUSTOM_RACK = "3dprinted_15_tuberack_15000ul"
 TIPS_300 = "opentrons_96_tiprack_300ul"
 
 SLOT_15ML_RACK = 2
 SLOT_TIPS_300 = 8
 
-SOURCE_WELLS = ["A1", "B1", "A2", "B2"]
-DEST_WELLS = ["A3", "B3", "A4", "B4"]
+SOURCE_WELLS = ["A1", "A2", "A3", "A4"]
+DEST_WELLS = ["C1", "C2", "C3", "C4"]
 
 HOVER_FROM_TOP = 10.0
 
@@ -36,7 +36,7 @@ def run(protocol: protocol_api.ProtocolContext):
     dests = [rack.wells_by_name()[name] for name in DEST_WELLS]
 
     protocol.pause(
-        f"Load custom 8-well 15 mL rack in SLOT {SLOT_15ML_RACK}. "
+        f"Load 3D-printed 15 mL tube rack in SLOT {SLOT_15ML_RACK}. "
         f"Place empty 15 mL tubes in {', '.join(SOURCE_WELLS + DEST_WELLS)}. "
         f"Resume to move the p300 above each tube at top({HOVER_FROM_TOP}). "
         "This test does not aspirate, dispense, or enter the tubes."

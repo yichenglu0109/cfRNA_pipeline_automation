@@ -2,21 +2,29 @@
 
 This folder contains a 4-sample tube-based pilot version of the OT-2 cfRNA workflow. It is independent from `Opentrons/scripts/OT2`.
 
+## Protocol Documents
+
+| Document | Purpose |
+| --- | --- |
+| `protocol.md` | Short index for this folder's protocol documents |
+| `extraction_OT2_protocol_15mL_tube.md` | General 15 mL tube-based OT-2 operating protocol |
+| `OT2_TUBE_PROTOCOL_PILOT_4_SAMPLES.md` | Current 4-sample OT-2-only pilot: two plasma samples, one water control and one positive-control mouse tissue extract |
+
 ## Hardware Assumptions
 
 - Left mount: `p300_single_gen2`
 - Right mount: `p20_single_gen2`
 - One shared `opentrons_24_aluminumblock_nest_2ml_snapcap` for Norgen/Zymo columns, eluates and small reagents
-- Custom 8-position 4-way 15 mL rack in slot 2
+- 3D-printed 15 mL tube rack in slot 2
 
 Upload this custom labware JSON in the Opentrons App before uploading the scripts:
 
-`labware/custom_4way_8x15ml_tuberack.json`
+`labware/3dprinted_15_tuberack_15000ul.json`
 
 The scripts load it by load name:
 
 ```python
-SAMPLE_TUBE_RACK = "custom_4way_8x15ml_tuberack"
+SAMPLE_TUBE_RACK = "3dprinted_15_tuberack_15000ul"
 ```
 
 The JSON is provisional. After measuring the physical rack, edit `x`, `y`,
@@ -24,40 +32,24 @@ The JSON is provisional. After measuring the physical rack, edit `x`, `y`,
 The shared 24-block remains the canonical
 `opentrons_24_aluminumblock_nest_2ml_snapcap`.
 
-Because the 4-way rack can overhang the slot 2 footprint, slots 1 and 3 are left
-empty by default. Reservoir steps use slot 5.
+The 3D-printed rack definition uses the standard slot 2 footprint
+(`127.76 mm x 85.48 mm`), so slots 1 and 3 are available unless a physical
+clearance check shows your printed rack overhangs. Reservoir steps use slot 5.
 
 ## Physical Placement Guide
 
-Use slot 2 as the reference footprint: `127.76 mm x 85.48 mm`. Center the 4-way
-rack on slot 2 before labware offset calibration.
-
-For a rack body dimension of `rack_x` by `rack_y`:
-
-```text
-left/right overhang = (rack_x - 127.76) / 2
-front/back gap      = (85.48 - rack_y) / 2
-```
-
-If using the common Heathrow/Stellar 4-way rack body (`174 mm x 95 mm`), the
-fully centered placement is about `23.1 mm` overhang on both left and right.
-That rack body is wider than the slot in both axes, so it would also overhang
-about `4.8 mm` front and back. If your measured `rack_y` is shorter than the
-slot instead, use the same formula and leave equal front/back gaps.
-
-The current 8-well JSON keeps only the in-slot usable 15 mL positions:
-`A1,B1,A2,B2,A3,B3,A4,B4`.
-
-Sample and waste 15 mL tube positions are explicit so the commercial and custom
-racks use the same identity order. Defaults:
+Use slot 2 as the reference footprint. The current JSON has a 3 row x 5 column
+layout (`A1-C5`). Sample and waste 15 mL tube positions are explicit so the
+same positions are used across all scripts. Defaults:
 
 ```bash
-SAMPLE_TUBES=A1,B1,A2,B2
-TRASH_TUBES=A3,B3,A4,B4
+SAMPLE_TUBES=A1,A2,A3,A4
+TRASH_TUBES=C1,C2,C3,C4
 ```
 
 Step 3 uses these `TRASH_TUBES` positions in the same slot 2 rack, so no second
-15 mL waste rack is required by default.
+15 mL waste rack is required by default. Row B is intentionally unused in the
+default 4-sample layout.
 
 ## Shared 24-Tube Rack Map
 
@@ -78,7 +70,8 @@ Small reagent positions:
 | D4 | Zymo prep buffer or Norgen wash buffer during Step 5 |
 | A5 | Zymo wash buffer 2 |
 | B5 | Nuclease-free water |
-| C5 | Slurry in Step 1, then Norgen elution buffer in Step 5b |
+| C5 | Slurry in Step 1, then Norgen elution buffer in Step 5b, then Zymo wash buffer 1 tube 1 in Step 6 |
+| D5 | Zymo wash buffer 1 tube 2 in Step 6 |
 
 The scripts pause before any position is reused.
 
@@ -96,14 +89,14 @@ N_SAMPLES=4 TIP_START=21 P20_TIP_START=1 opentrons_execute 6_zymo_clean_conc_tub
 
 ## Rack Position / Water Test
 
-Upload `labware/custom_4way_8x15ml_tuberack.json`, then upload and run:
+Upload `labware/3dprinted_15_tuberack_15000ul.json`, then upload and run:
 
 ```bash
-opentrons_execute test_4way_15ml_positions_water.py
+opentrons_execute test_3dprinted_15ml_positions_water.py
 ```
 
 The test protocol is now a no-liquid safety check. It moves the p300 over
-A1/B1/A2/B2/A3/B3/A4/B4 at `top(10.0)` only, pauses, then repeats the hover
+A1/A2/A3/A4/C1/C2/C3/C4 at `top(10.0)` only, pauses, then repeats the hover
 path in reverse. It does not aspirate, dispense, or enter the tubes.
 
 ## Calibration Notes
@@ -113,6 +106,7 @@ All tube and filter-column heights are centralized in `config.py` and can be ove
 - 15 mL conical tube aspiration and decant heights
 - Norgen column dispense/elution heights
 - Zymo column dispense/elution heights
+- shared 24-block safe travel height for tall tubes/column stacks
 - final p20 15 uL elution placement
 
 This tube pilot defaults to `bottom(1.0)` for most 24-block LoBind reagent sources. Prior OT2 scripts used `bottom(1.5)` for those reagent sources, `bottom(2)` for slurry, and `bottom(5)` / `bottom(8)` for p20 DNase dispense/blowout into 2 mL wells.
@@ -120,10 +114,11 @@ This tube pilot defaults to `bottom(1.0)` for most 24-block LoBind reagent sourc
 Common height overrides:
 
 ```bash
-NORGEN_COLUMN_DISPENSE_FROM_TOP=10 \
-ZYMO_COLUMN_DISPENSE_FROM_TOP=10 \
-NORGEN_ELUTE_FROM_BOTTOM=5 \
-ZYMO_ELUTE_FROM_BOTTOM=5 \
+NORGEN_COLUMN_DISPENSE_FROM_TOP=-3 \
+ZYMO_COLUMN_DISPENSE_FROM_TOP=0 \
+NORGEN_ELUTE_FROM_TOP=-12 \
+ZYMO_ELUTE_FROM_TOP=-12 \
+SHARED_BLOCK_SAFE_TRAVEL_FROM_TOP=25 \
 REAGENT_TUBE_ASPIRATE_H=1.0 \
-opentrons_execute 5_norgen_wash_tube.py
+opentrons_execute 6_zymo_clean_conc_tube.py
 ```

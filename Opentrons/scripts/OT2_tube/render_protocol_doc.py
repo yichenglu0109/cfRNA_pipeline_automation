@@ -13,6 +13,16 @@ DOCS = {
         "html": ROOT / "protocol.html",
         "title": "Tube-Based OT2 cfRNA Protocol",
     },
+    "main": {
+        "md": ROOT / "extraction_OT2_protocol_15mL_tube.md",
+        "html": ROOT / "extraction_OT2_protocol_15mL_tube.html",
+        "title": "15 mL Tube-Based OT2 cfRNA Protocol",
+    },
+    "pilot": {
+        "md": ROOT / "OT2_TUBE_PROTOCOL_PILOT_4_SAMPLES.md",
+        "html": ROOT / "OT2_TUBE_PROTOCOL_PILOT_4_SAMPLES.html",
+        "title": "OT2 Tube Pilot 4 Samples",
+    },
 }
 
 STYLE = """@page { margin: 0.45in; }
@@ -158,4 +168,4 @@ if __name__ == "__main__":
     elif target in DOCS:
         render_doc(target)
     else:
-        raise SystemExit(f"Usage: python3 {Path(__file__).name} [protocol|all]")
+        raise SystemExit(f"Usage: python3 {Path(__file__).name} [protocol|main|pilot|all]")

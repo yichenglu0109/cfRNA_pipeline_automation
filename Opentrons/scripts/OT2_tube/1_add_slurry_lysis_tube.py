@@ -40,20 +40,20 @@ except ImportError:
     TIPS_20 = "opentrons_96_tiprack_20ul"
     TUBE_BLOCK_2ML = "opentrons_24_aluminumblock_nest_2ml_snapcap"
     RESERVOIR_1 = "nest_1_reservoir_195ml"
-    SAMPLE_TUBE_RACK = os.environ.get("SAMPLE_TUBE_RACK", "custom_4way_8x15ml_tuberack")
+    SAMPLE_TUBE_RACK = os.environ.get("SAMPLE_TUBE_RACK", "3dprinted_15_tuberack_15000ul")
 
     USE_CUSTOM_15ML_RACK = os.environ.get("USE_CUSTOM_15ML_RACK", "0") == "1"
-    CUSTOM_15ML_RACK_LOAD_NAME = os.environ.get("CUSTOM_15ML_RACK_LOAD_NAME", "custom_flexible_15ml_conical_rack")
-    CUSTOM_15ML_RACK_X0 = float(os.environ.get("CUSTOM_15ML_RACK_X0", "27.9"))
-    CUSTOM_15ML_RACK_Y0 = float(os.environ.get("CUSTOM_15ML_RACK_Y0", "40.2"))
-    CUSTOM_15ML_RACK_X_SPACING = float(os.environ.get("CUSTOM_15ML_RACK_X_SPACING", "24.0"))
-    CUSTOM_15ML_RACK_Y_SPACING = float(os.environ.get("CUSTOM_15ML_RACK_Y_SPACING", "25.0"))
-    CUSTOM_15ML_RACK_WELL_Z = float(os.environ.get("CUSTOM_15ML_RACK_WELL_Z", "0.0"))
-    CUSTOM_15ML_RACK_DIAMETER = float(os.environ.get("CUSTOM_15ML_RACK_DIAMETER", "17.5"))
-    CUSTOM_15ML_RACK_DEPTH = float(os.environ.get("CUSTOM_15ML_RACK_DEPTH", "115.0"))
-    CUSTOM_15ML_RACK_TOTAL_X = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_X", "127.8"))
-    CUSTOM_15ML_RACK_TOTAL_Y = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_Y", "85.5"))
-    CUSTOM_15ML_RACK_TOTAL_Z = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_Z", "120.0"))
+    CUSTOM_15ML_RACK_LOAD_NAME = os.environ.get("CUSTOM_15ML_RACK_LOAD_NAME", "3dprinted_15_tuberack_15000ul")
+    CUSTOM_15ML_RACK_X0 = float(os.environ.get("CUSTOM_15ML_RACK_X0", "13.88"))
+    CUSTOM_15ML_RACK_Y0 = float(os.environ.get("CUSTOM_15ML_RACK_Y0", "69.24"))
+    CUSTOM_15ML_RACK_X_SPACING = float(os.environ.get("CUSTOM_15ML_RACK_X_SPACING", "25.0"))
+    CUSTOM_15ML_RACK_Y_SPACING = float(os.environ.get("CUSTOM_15ML_RACK_Y_SPACING", "-25.0"))
+    CUSTOM_15ML_RACK_WELL_Z = float(os.environ.get("CUSTOM_15ML_RACK_WELL_Z", "8.0"))
+    CUSTOM_15ML_RACK_DIAMETER = float(os.environ.get("CUSTOM_15ML_RACK_DIAMETER", "14.9"))
+    CUSTOM_15ML_RACK_DEPTH = float(os.environ.get("CUSTOM_15ML_RACK_DEPTH", "117.5"))
+    CUSTOM_15ML_RACK_TOTAL_X = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_X", "127.76"))
+    CUSTOM_15ML_RACK_TOTAL_Y = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_Y", "85.48"))
+    CUSTOM_15ML_RACK_TOTAL_Z = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_Z", "125.5"))
 
     SLOT_REAGENT_A = 5
     SLOT_SAMPLE_TUBES = 2
@@ -64,8 +64,8 @@ except ImportError:
     SLOT_TIPS_300_A = 8
     SLOT_TIPS_300_B = 9
 
-    SAMPLE_TUBES = os.environ.get("SAMPLE_TUBES", "A1,B1,A2,B2").split(",")
-    TRASH_TUBES = os.environ.get("TRASH_TUBES", "A3,B3,A4,B4").split(",")
+    SAMPLE_TUBES = os.environ.get("SAMPLE_TUBES", "A1,A2,A3,A4").split(",")
+    TRASH_TUBES = os.environ.get("TRASH_TUBES", "C1,C2,C3,C4").split(",")
     ELUATE_TUBES = ["A1", "B1", "C1", "D1"]
     ZYMO_INPUT_TUBES = ELUATE_TUBES
     NORGEN_COLUMN_TUBES = ["A1", "B1", "C1", "D1"]
@@ -78,26 +78,26 @@ except ImportError:
     ZYMO_WATER_TUBE = "B5"
     NORG_ELU_TUBE = "C5"
 
-    SAMPLE_ASPIRATE_H = float(os.environ.get("SAMPLE_ASPIRATE_H", "2.0"))
+    SAMPLE_ASPIRATE_H = float(os.environ.get("SAMPLE_ASPIRATE_H", "1.0"))
     SAMPLE_MIX_LOW_H = float(os.environ.get("SAMPLE_MIX_LOW_H", "2.0"))
     SAMPLE_MIX_HIGH_H = float(os.environ.get("SAMPLE_MIX_HIGH_H", "12.0"))
     SAMPLE_DISPENSE_H = float(os.environ.get("SAMPLE_DISPENSE_H", "25.0"))
-    SAMPLE_TOP_DISPENSE_OFFSET = float(os.environ.get("SAMPLE_TOP_DISPENSE_OFFSET", "-5"))
+    SAMPLE_TOP_DISPENSE_OFFSET = float(os.environ.get("SAMPLE_TOP_DISPENSE_OFFSET", "5.0"))
     TRASH_DISPENSE_H = float(os.environ.get("TRASH_DISPENSE_H", "35.0"))
     REAGENT_TUBE_ASPIRATE_H = float(os.environ.get("REAGENT_TUBE_ASPIRATE_H", "1.0"))
     SLURRY_TUBE_ASPIRATE_H = float(os.environ.get("SLURRY_TUBE_ASPIRATE_H", "2.0"))
     DNASE_DISPENSE_H = float(os.environ.get("DNASE_DISPENSE_H", "5.0"))
     DNASE_BLOWOUT_H = float(os.environ.get("DNASE_BLOWOUT_H", "8.0"))
-    NORGEN_COLUMN_DISPENSE_FROM_TOP = float(os.environ.get("NORGEN_COLUMN_DISPENSE_FROM_TOP", "5.0"))
-    NORGEN_COLUMN_BLOWOUT_FROM_TOP = float(os.environ.get("NORGEN_COLUMN_BLOWOUT_FROM_TOP", "5.0"))
-    NORGEN_ELUTE_FROM_BOTTOM = float(os.environ.get("NORGEN_ELUTE_FROM_BOTTOM", "5.0"))
-    NORGEN_ELUTE_BLOWOUT_FROM_BOTTOM = float(os.environ.get("NORGEN_ELUTE_BLOWOUT_FROM_BOTTOM", "6.0"))
+    NORGEN_COLUMN_DISPENSE_FROM_TOP = float(os.environ.get("NORGEN_COLUMN_DISPENSE_FROM_TOP", "-3.0"))
+    NORGEN_COLUMN_BLOWOUT_FROM_TOP = float(os.environ.get("NORGEN_COLUMN_BLOWOUT_FROM_TOP", "0.0"))
+    NORGEN_ELUTE_FROM_TOP = float(os.environ.get("NORGEN_ELUTE_FROM_TOP", "-12.0"))
+    NORGEN_ELUTE_BLOWOUT_FROM_TOP = float(os.environ.get("NORGEN_ELUTE_BLOWOUT_FROM_TOP", "-8.0"))
     ZYMO_COLUMN_DISPENSE_FROM_TOP = float(os.environ.get("ZYMO_COLUMN_DISPENSE_FROM_TOP", "5.0"))
     ZYMO_COLUMN_BLOWOUT_FROM_TOP = float(os.environ.get("ZYMO_COLUMN_BLOWOUT_FROM_TOP", "5.0"))
     ZYMO_ELUTE_FROM_BOTTOM = float(os.environ.get("ZYMO_ELUTE_FROM_BOTTOM", "5.0"))
     ZYMO_ELUTE_BLOWOUT_FROM_BOTTOM = float(os.environ.get("ZYMO_ELUTE_BLOWOUT_FROM_BOTTOM", "6.0"))
 
-    DECANT_HEIGHTS = [37, 34, 30, 26, 22, 18, 14, 10, 8, 6, 5, 4]
+    DECANT_HEIGHTS = [45, 41, 37, 33, 29, 25, 21, 17, 13, 11, 9, 7.5]
     DECANT_VOL = 250
     DECANT_REPS = 2
 
@@ -116,8 +116,8 @@ except ImportError:
         return [by_name[name] for name in names]
 
     def custom_15ml_rack_definition():
-        rows = ["A", "B"]
-        cols = ["1", "2", "3", "4"]
+        rows = ["A", "B", "C"]
+        cols = ["1", "2", "3", "4", "5"]
         wells = {}
         ordering = []
         for col_index, col in enumerate(cols):
@@ -139,7 +139,7 @@ except ImportError:
             "ordering": ordering,
             "wells": wells,
             "groups": [{"metadata": {"wellBottomShape": "v"}, "wells": [name for col in ordering for name in col]}],
-            "metadata": {"displayName": "Flexible 15 mL conical tube rack", "displayCategory": "tubeRack", "displayVolumeUnits": "uL"},
+            "metadata": {"displayName": "3D-printed 15 mL tube rack", "displayCategory": "tubeRack", "displayVolumeUnits": "uL"},
             "parameters": {"format": "irregular", "isTiprack": False, "loadName": CUSTOM_15ML_RACK_LOAD_NAME},
             "namespace": "custom_beta",
             "version": 1,
@@ -233,7 +233,8 @@ def run(protocol: protocol_api.ProtocolContext):
     lysis_src = make_single_source(lysis_res.wells()[0], lysis_total)
 
     protocol.pause(
-        f"STEP 1A: Place {n} 15 mL conical sample tubes in SLOT {SLOT_SAMPLE_TUBES}. "
+        f"STEP 1A: Place {n} 15 mL conical sample tubes in SLOT {SLOT_SAMPLE_TUBES} "
+        f"positions {', '.join(SAMPLE_TUBES[:n])}. "
         f"Place shared 24-tube rack in SLOT {SLOT_SHARED_2ML}. "
         f"Add {format_ul(slurry_total)} vortexed slurry to tube {NORG_ELU_TUBE}. "
         "Resume to dispense slurry."
@@ -241,11 +242,11 @@ def run(protocol: protocol_api.ProtocolContext):
 
     p300.pick_up_tip()
     for tube in samples:
-        p300.mix(3, 100, slurry_src.aspiration_location(0), rate=0.8)
+        p300.mix(2, 100, slurry_src.aspiration_location(0), rate=0.8)
         p300.aspirate(SLURRY_VOL, slurry_src.aspiration_location(SLURRY_VOL), rate=0.2)
         protocol.delay(seconds=1.5)
         p300.air_gap(10)
-        p300.dispense(SLURRY_VOL + 10, tube.top(SAMPLE_TOP_DISPENSE_OFFSET))
+        p300.dispense(SLURRY_VOL + 10, tube.bottom(10))
         p300.blow_out(tube.top(SAMPLE_TOP_DISPENSE_OFFSET))
     p300.drop_tip()
 
@@ -259,7 +260,7 @@ def run(protocol: protocol_api.ProtocolContext):
         lysis_iters, lysis_per = split_volume(LYSIS_VOL)
         for _ in range(lysis_iters):
             p300.aspirate(lysis_per, lysis_src.aspiration_location(lysis_per))
-            p300.dispense(lysis_per, tube.top(SAMPLE_TOP_DISPENSE_OFFSET))
+            p300.dispense(lysis_per, tube.bottom(50))
             p300.blow_out(tube.top(SAMPLE_TOP_DISPENSE_OFFSET))
     p300.drop_tip()
 

@@ -2,7 +2,7 @@
 Shared settings for tube-based cfRNA OT-2 pilot protocols.
 
 This pilot intentionally keeps all tube/filter-column heights centralized.
-Sample extraction uses a custom 4-way 8-position 15 mL tube rack because the
+Sample extraction uses a 3D-printed 15 mL tube rack because the
 lysis + sample + EtOH volume exceeds 2 mL.
 """
 
@@ -46,11 +46,11 @@ TIPS_20 = "opentrons_96_tiprack_20ul"
 TUBE_BLOCK_2ML = "opentrons_24_aluminumblock_nest_2ml_snapcap"
 RESERVOIR_1 = "nest_1_reservoir_195ml"
 
-# Custom 4-way 8-position 15 mL rack. Upload the matching JSON in
-# labware/custom_4way_8x15ml_tuberack.json before uploading protocols.
+# 3D-printed 15 mL tube rack. Upload the matching JSON in
+# labware/3dprinted_15_tuberack_15000ul.json before uploading protocols.
 SAMPLE_TUBE_RACK = os.environ.get(
     "SAMPLE_TUBE_RACK",
-    "custom_4way_8x15ml_tuberack",
+    "3dprinted_15_tuberack_15000ul",
 )
 
 # Optional dynamic custom definition for command-line testing. The Opentrons App
@@ -58,18 +58,18 @@ SAMPLE_TUBE_RACK = os.environ.get(
 USE_CUSTOM_15ML_RACK = os.environ.get("USE_CUSTOM_15ML_RACK", "0") == "1"
 CUSTOM_15ML_RACK_LOAD_NAME = os.environ.get(
     "CUSTOM_15ML_RACK_LOAD_NAME",
-    "custom_flexible_15ml_conical_rack",
+    "3dprinted_15_tuberack_15000ul",
 )
-CUSTOM_15ML_RACK_X0 = float(os.environ.get("CUSTOM_15ML_RACK_X0", "27.9"))
-CUSTOM_15ML_RACK_Y0 = float(os.environ.get("CUSTOM_15ML_RACK_Y0", "40.2"))
-CUSTOM_15ML_RACK_X_SPACING = float(os.environ.get("CUSTOM_15ML_RACK_X_SPACING", "24.0"))
-CUSTOM_15ML_RACK_Y_SPACING = float(os.environ.get("CUSTOM_15ML_RACK_Y_SPACING", "25.0"))
-CUSTOM_15ML_RACK_WELL_Z = float(os.environ.get("CUSTOM_15ML_RACK_WELL_Z", "0.0"))
-CUSTOM_15ML_RACK_DIAMETER = float(os.environ.get("CUSTOM_15ML_RACK_DIAMETER", "17.5"))
-CUSTOM_15ML_RACK_DEPTH = float(os.environ.get("CUSTOM_15ML_RACK_DEPTH", "115.0"))
-CUSTOM_15ML_RACK_TOTAL_X = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_X", "127.8"))
-CUSTOM_15ML_RACK_TOTAL_Y = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_Y", "85.5"))
-CUSTOM_15ML_RACK_TOTAL_Z = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_Z", "120.0"))
+CUSTOM_15ML_RACK_X0 = float(os.environ.get("CUSTOM_15ML_RACK_X0", "13.88"))
+CUSTOM_15ML_RACK_Y0 = float(os.environ.get("CUSTOM_15ML_RACK_Y0", "69.24"))
+CUSTOM_15ML_RACK_X_SPACING = float(os.environ.get("CUSTOM_15ML_RACK_X_SPACING", "25.0"))
+CUSTOM_15ML_RACK_Y_SPACING = float(os.environ.get("CUSTOM_15ML_RACK_Y_SPACING", "-25.0"))
+CUSTOM_15ML_RACK_WELL_Z = float(os.environ.get("CUSTOM_15ML_RACK_WELL_Z", "8.0"))
+CUSTOM_15ML_RACK_DIAMETER = float(os.environ.get("CUSTOM_15ML_RACK_DIAMETER", "14.9"))
+CUSTOM_15ML_RACK_DEPTH = float(os.environ.get("CUSTOM_15ML_RACK_DEPTH", "117.5"))
+CUSTOM_15ML_RACK_TOTAL_X = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_X", "127.76"))
+CUSTOM_15ML_RACK_TOTAL_Y = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_Y", "85.48"))
+CUSTOM_15ML_RACK_TOTAL_Z = float(os.environ.get("CUSTOM_15ML_RACK_TOTAL_Z", "125.5"))
 
 # Deck slots used consistently across tube pilot scripts.
 SLOT_REAGENT_A = 5
@@ -83,8 +83,8 @@ SLOT_TIPS_300_B = 9
 
 # Shared 24-tube rack map. The same block holds columns, eluates and reagents
 # at different times/positions. Prompts tell the user when to refill/swap.
-SAMPLE_TUBES = os.environ.get("SAMPLE_TUBES", "A1,B1,A2,B2").split(",")
-TRASH_TUBES = os.environ.get("TRASH_TUBES", "A3,B3,A4,B4").split(",")
+SAMPLE_TUBES = os.environ.get("SAMPLE_TUBES", "A1,A2,A3,A4").split(",")
+TRASH_TUBES = os.environ.get("TRASH_TUBES", "C1,C2,C3,C4").split(",")
 ELUATE_TUBES = ["A1", "B1", "C1", "D1"]
 ZYMO_INPUT_TUBES = ELUATE_TUBES
 NORGEN_COLUMN_TUBES = ["A1", "B1", "C1", "D1"]
@@ -93,6 +93,7 @@ DNASE_MIX_TUBE = "A4"
 ZYMO_BIND_TUBE = "B4"
 ZYMO_ETOH_TUBE = "C4"
 ZYMO_PREP_TUBE = "D4"
+ZYMO_WASH1_TUBES = ["C5", "D5"]
 ZYMO_WASH2_TUBE = "A5"
 ZYMO_WATER_TUBE = "B5"
 NORG_ELU_TUBE = "C5"
@@ -101,6 +102,7 @@ SMALL_REAGENT_TUBES = [
     ZYMO_BIND_TUBE,
     ZYMO_ETOH_TUBE,
     ZYMO_PREP_TUBE,
+    *ZYMO_WASH1_TUBES,
     ZYMO_WASH2_TUBE,
     ZYMO_WATER_TUBE,
     NORG_ELU_TUBE,
@@ -110,7 +112,7 @@ SMALL_REAGENT_TUBES = [
 # For 24-block reagent tubes, this tube pilot defaults to bottom(1.0) after
 # prior tests showed enough clearance. Prior OT2 scripts used bottom(1.5) for
 # most LoBind reagent sources and bottom(2) for slurry.
-SAMPLE_ASPIRATE_H = float(os.environ.get("SAMPLE_ASPIRATE_H", "2.0"))
+SAMPLE_ASPIRATE_H = float(os.environ.get("SAMPLE_ASPIRATE_H", "1.0"))
 SAMPLE_MIX_LOW_H = float(os.environ.get("SAMPLE_MIX_LOW_H", "2.0"))
 SAMPLE_MIX_HIGH_H = float(os.environ.get("SAMPLE_MIX_HIGH_H", "12.0"))
 SAMPLE_DISPENSE_H = float(os.environ.get("SAMPLE_DISPENSE_H", "25.0"))
@@ -118,25 +120,27 @@ SAMPLE_TOP_DISPENSE_OFFSET = float(os.environ.get("SAMPLE_TOP_DISPENSE_OFFSET", 
 TRASH_DISPENSE_H = float(os.environ.get("TRASH_DISPENSE_H", "35.0"))
 
 REAGENT_TUBE_ASPIRATE_H = float(os.environ.get("REAGENT_TUBE_ASPIRATE_H", "1.0"))
+ZYMO_INPUT_ASPIRATE_H = float(os.environ.get("ZYMO_INPUT_ASPIRATE_H", "2.0"))
 SLURRY_TUBE_ASPIRATE_H = float(os.environ.get("SLURRY_TUBE_ASPIRATE_H", "2.0"))
 DNASE_DISPENSE_H = float(os.environ.get("DNASE_DISPENSE_H", "5.0"))
 DNASE_BLOWOUT_H = float(os.environ.get("DNASE_BLOWOUT_H", "8.0"))
+SHARED_BLOCK_SAFE_TRAVEL_FROM_TOP = float(os.environ.get("SHARED_BLOCK_SAFE_TRAVEL_FROM_TOP", "25.0"))
 
 # Column positions are relative to the 24-block well, not the true filter top.
 # top(+5) is a conservative default above the rack well opening. Tune after
 # loading the actual Norgen/Zymo column + collection tube stack.
-NORGEN_COLUMN_DISPENSE_FROM_TOP = float(os.environ.get("NORGEN_COLUMN_DISPENSE_FROM_TOP", "5.0"))
-NORGEN_COLUMN_BLOWOUT_FROM_TOP = float(os.environ.get("NORGEN_COLUMN_BLOWOUT_FROM_TOP", "5.0"))
-NORGEN_ELUTE_FROM_BOTTOM = float(os.environ.get("NORGEN_ELUTE_FROM_BOTTOM", "5.0"))
-NORGEN_ELUTE_BLOWOUT_FROM_BOTTOM = float(os.environ.get("NORGEN_ELUTE_BLOWOUT_FROM_BOTTOM", "6.0"))
+NORGEN_COLUMN_DISPENSE_FROM_TOP = float(os.environ.get("NORGEN_COLUMN_DISPENSE_FROM_TOP", "-3.0"))
+NORGEN_COLUMN_BLOWOUT_FROM_TOP = float(os.environ.get("NORGEN_COLUMN_BLOWOUT_FROM_TOP", "0.0"))
+NORGEN_ELUTE_FROM_TOP = float(os.environ.get("NORGEN_ELUTE_FROM_TOP", "-12.0"))
+NORGEN_ELUTE_BLOWOUT_FROM_TOP = float(os.environ.get("NORGEN_ELUTE_BLOWOUT_FROM_TOP", "-8.0"))
 
-ZYMO_COLUMN_DISPENSE_FROM_TOP = float(os.environ.get("ZYMO_COLUMN_DISPENSE_FROM_TOP", "5.0"))
-ZYMO_COLUMN_BLOWOUT_FROM_TOP = float(os.environ.get("ZYMO_COLUMN_BLOWOUT_FROM_TOP", "5.0"))
-ZYMO_ELUTE_FROM_BOTTOM = float(os.environ.get("ZYMO_ELUTE_FROM_BOTTOM", "5.0"))
-ZYMO_ELUTE_BLOWOUT_FROM_BOTTOM = float(os.environ.get("ZYMO_ELUTE_BLOWOUT_FROM_BOTTOM", "6.0"))
+ZYMO_COLUMN_DISPENSE_FROM_TOP = float(os.environ.get("ZYMO_COLUMN_DISPENSE_FROM_TOP", "0.0"))
+ZYMO_COLUMN_BLOWOUT_FROM_TOP = float(os.environ.get("ZYMO_COLUMN_BLOWOUT_FROM_TOP", "0.0"))
+ZYMO_ELUTE_FROM_TOP = float(os.environ.get("ZYMO_ELUTE_FROM_TOP", "-12.0"))
+ZYMO_ELUTE_BLOWOUT_FROM_TOP = float(os.environ.get("ZYMO_ELUTE_BLOWOUT_FROM_TOP", "-8.0"))
 
 # Conservative staged decant heights for 15 mL conical tubes; tune after water/slurry QC.
-DECANT_HEIGHTS = [37, 34, 30, 26, 22, 18, 14, 10, 8, 6, 5, 4]
+DECANT_HEIGHTS = [45, 41, 37, 33, 29, 25, 21, 17, 13, 11, 9, 7.5]
 DECANT_VOL = 250
 DECANT_REPS = 2
 
@@ -160,8 +164,8 @@ def wells_by_names(labware, names):
 
 
 def custom_15ml_rack_definition():
-    rows = ["A", "B"]
-    cols = ["1", "2", "3", "4"]
+    rows = ["A", "B", "C"]
+    cols = ["1", "2", "3", "4", "5"]
     wells = {}
     ordering = []
     for col_index, col in enumerate(cols):
@@ -189,7 +193,7 @@ def custom_15ml_rack_definition():
             }
         ],
         "metadata": {
-            "displayName": "Flexible 15 mL conical tube rack",
+            "displayName": "3D-printed 15 mL tube rack",
             "displayCategory": "tubeRack",
             "displayVolumeUnits": "uL",
         },
